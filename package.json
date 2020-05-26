@@ -24,7 +24,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "build:netlify": "react-scripts build && cp index.netlify.html public/index.html & echo \"OK\""
+    "build:netlify": "npm run build && cp src/index.netlify.html public/index.html && echo \"OK\""
   },
   "eslintConfig": {
     "extends": "react-app"

@@ -16,6 +16,7 @@
     "@types/react-router-dom": "^5.1.5",
     "axios": "^0.19.2",
     "classnames": "^2.2.6",
+    "date-fns": "^2.14.0",
     "gatsby-link": "^2.4.5",
     "primeicons": "^4.0.0-rc.2",
     "primereact": "^4.2.1",

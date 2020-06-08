@@ -9,7 +9,7 @@ const App: React.FC<{}> = (props) => {
       <Route path="/list">List courses</Route>
       <Route path="/">
         Route not found, please set a route in the url hash (e.g. /edit or /new)
-        1
+        2
       </Route>
     </Switch>
   );

@@ -19,6 +19,11 @@ const CourseEdit: React.FC<{}> = (props) => {
       <Formik
         initialValues={{
           titel: '',
+          prijsPerDeelnemer: 0,
+          promotieTekst: '',
+          maxAantalDeelnemers: 1,
+          opmerkingen: '',
+          docent: '',
         }}
         onSubmit={(values, actions) => {
           setTimeout(() => {

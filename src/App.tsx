@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Switch, Route } from 'react-router-dom';
 
-import { Theme, ThemeContext } from '@erkenningen/ui';
+import { Theme, ThemeContext } from '@erkenningen/ui/';
 import { ERKENNINGEN_SITE_TYPE } from '@erkenningen/config';
 
 import CourseEdit from './courses/edit/CourseEdit';

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Formik } from 'formik';
+import { FormikProps } from 'formik';
 
 import {
   Panel,
@@ -13,54 +13,80 @@ import {
   Button,
 } from '@erkenningen/ui';
 
+import AddLocation from 'location/AddLocation';
+import FormSelectGql from 'components/FormSelectGql';
+import { gql } from 'apollo-boost';
+
 const CourseEdit: React.FC<{}> = (props) => {
+  const [showAddLocationDialog, setShowAddLocationDialog] = useState<boolean>(false);
+  const [currentForm, setCurrentForm] = useState<FormikProps<any>>();
+
+  const onNewLocationClick = (formikProps: FormikProps<any>) => {
+    setCurrentForm(formikProps);
+    setShowAddLocationDialog(true);
+  };
+
+  const handleAddLocation = (LokatieID?: number) => {
+    if (currentForm) {
+      currentForm.setFieldValue('LokatieID', LokatieID);
+    }
+    setShowAddLocationDialog(false);
+  };
   return (
     <>
-      <Formik
+      <Form
         initialValues={{
           titel: '',
-          prijsPerDeelnemer: 0,
           promotieTekst: '',
+          prijsPerDeelnemer: 0,
           maxAantalDeelnemers: 1,
+          besloten: false,
           opmerkingen: '',
+          datum: null,
+          beginTijd: null,
+          eindTijd: null,
+          LokatieID: null,
           docent: '',
+          organizer: null,
+          specialty: null,
         }}
         onSubmit={(values, actions) => {
           setTimeout(() => {
             alert(JSON.stringify(values, null, 2));
             actions.setSubmitting(false);
-          }, 3000);
+          }, 1000);
         }}
       >
-        {(props) => (
-          <Form onSubmit={props.handleSubmit}>
+        {(formikProps: FormikProps<any>) => (
+          <>
             <Panel title="Nieuwe bijeenkomst maken">
               <FormSelect
-                labelClassNames="col-sm-12"
+                labelClassNames="col-sm-12 text-left"
                 placeholder={'Selecteer een kennisaanbieder'}
-                id={'organizer'}
+                name={'organizer'}
                 label={'Kies de kennisaanbieder waarvoor u een nieuwe cursus wilt maken'}
                 options={[
                   { label: 'A', value: 1 },
                   { label: 'B', value: 2 },
                   { label: 'C', value: 3 },
                 ]}
-                value={2}
+                filter={true}
               />
               <FormSelect
-                labelClassNames="col-sm-12"
+                labelClassNames="col-sm-12 text-left"
                 placeholder={'Selecteer een kennisaanbod'}
                 helpText={'Geldig van 25-05-2020 tot 23-09-2022 TODO!'}
-                id={'specialty'}
+                name={'specialty'}
                 label={'Kies het kennisaanbod waarop u de nieuwe bijeenkomst wilt baseren:'}
                 options={[
                   { label: 'A', value: 1 },
-                  { label: 'B', value: 2 },
+                  { label: 'B', value: 210007 },
                   { label: 'C', value: 3 },
                 ]}
+                filter={true}
               />
             </Panel>
-            <Panel title="Bijeenkomst">
+            <Panel title="Bijeenkomst" className="form-horizontal">
               <FormText name={'titel'} label={'Titel'} />
               <FormText name={'promotieTekst'} label={'Promotietekst'} isTextArea={true} />
               <FormText
@@ -75,22 +101,37 @@ const CourseEdit: React.FC<{}> = (props) => {
                 formControlClassName="col-sm-2"
                 placeholder={'1'}
               />
-              <FormCheckbox id={'besloten'} label={'Besloten'} value={true} />
+              <FormCheckbox name={'besloten'} label={'Besloten'} />
               <FormText name={'opmerkingen'} label={'Opmerkingen'} isTextArea={true} />
-              <FormCalendar id={'datum'} label={'Datum'} formControlClassName="col-sm-3" />
-              <FormCalendar id={'beginTijd'} label={'Begintijd'} formControlClassName="col-sm-3" />
-              <FormCalendar id={'eindTijd'} label={'Eindtijd'} formControlClassName="col-sm-3" />
-              <FormSelect
-                id={'locatie'}
+              <FormCalendar name={'datum'} label={'Datum'} formControlClassName="col-sm-3" />
+              <FormCalendar
+                name={'beginTijd'}
+                label={'Begintijd'}
+                formControlClassName="col-sm-3"
+              />
+              <FormCalendar name={'eindTijd'} label={'Eindtijd'} formControlClassName="col-sm-3" />
+              <FormSelectGql
+                name={'LokatieID'}
                 label={'Locatie'}
-                options={[
-                  { label: 'A', value: 1 },
-                  { label: 'B', value: 2 },
-                  { label: 'C', value: 3 },
-                ]}
                 placeholder={'Selecteer een locatie'}
                 formControlClassName="col-sm-5"
-              />
+                filter={true}
+                gqlQuery={gql`
+                  {
+                    SearchLocations(input: { VakgroepID: ${formikProps.values.specialty} }) {
+                      Text: Naam
+                      Value: LokatieID
+                    }
+                  }
+                `}
+              >
+                <Button
+                  className="mr-2"
+                  label="Nieuwe locatie aanmaken"
+                  type="link"
+                  onClick={() => onNewLocationClick(formikProps)}
+                />
+              </FormSelectGql>
               <FormText
                 name={'docent'}
                 label={'Docent(en)'}
@@ -100,9 +141,10 @@ const CourseEdit: React.FC<{}> = (props) => {
                 <Button label={'Opslaan'} buttonType="submit" />
               </FormItem>
             </Panel>
-          </Form>
+          </>
         )}
-      </Formik>
+      </Form>
+      <AddLocation onHide={handleAddLocation} visible={showAddLocationDialog} />
     </>
   );
 };

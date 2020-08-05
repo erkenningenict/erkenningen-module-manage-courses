@@ -15,7 +15,6 @@ yup.setLocale({
     default: 'Ongeldig',
     required: 'Verplicht',
     notType: (params: FormatErrorParams) => {
-      console.log(params);
       if (!params.value) {
         return 'Verplicht';
       }
@@ -34,15 +33,6 @@ yup.setLocale({
     email: 'Ongeldig e-mailadres',
     min: 'Minimaal ${min} karakters', // eslint-disable-line no-template-curly-in-string
     max: 'Maximaal ${max} karakters', // eslint-disable-line no-template-curly-in-string
-  },
-  number: {
-    // min?: TestOptionsMessage<{ min: number }>;
-    // max?: TestOptionsMessage<{ max: number }>;
-    // lessThan?: TestOptionsMessage<{ less: number }>;
-    // moreThan?: TestOptionsMessage<{ more: number }>;
-    // positive?: TestOptionsMessage<{ more: number }>;
-    // negative?: TestOptionsMessage<{ less: number }>;
-    // integer?: TestOptionsMessage;
   },
 });
 

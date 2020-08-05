@@ -70,7 +70,12 @@ const AddLocation: React.FC<{
   const dialogFooter = (formikProps: FormikProps<any>) => {
     return (
       <div>
-        <Button label={'Annuleren'} buttonType="button" type="secondary" onClick={props.onHide} />
+        <Button
+          label={'Annuleren'}
+          buttonType="button"
+          type="secondary"
+          onClick={() => props.onHide}
+        />
         <Button label={'Opslaan'} buttonType="submit" loading={formikProps.isSubmitting} />
       </div>
     );

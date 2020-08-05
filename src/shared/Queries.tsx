@@ -51,3 +51,11 @@ export const GET_SPECIALTY = gql`
     }
   }
 `;
+
+export const CREATE_COURSE = gql`
+  mutation createCourse($input: CreateCourseInput!) {
+    createCourse(input: $input) {
+      CursusID
+    }
+  }
+`;

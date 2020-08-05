@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { DocumentNode } from 'graphql';
 
 import { FormSelect } from '@erkenningen/ui';

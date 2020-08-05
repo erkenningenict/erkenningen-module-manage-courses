@@ -2,10 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { HashRouter } from 'react-router-dom';
-import { ApolloProvider } from '@apollo/react-hooks';
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import { ApolloClient } from 'apollo-client';
-import { HttpLink } from 'apollo-link-http';
+import { ApolloClient, ApolloProvider, HttpLink, InMemoryCache } from '@apollo/client';
 
 import { ERKENNINGEN_GRAPHQL_API_URL } from '@erkenningen/config';
 

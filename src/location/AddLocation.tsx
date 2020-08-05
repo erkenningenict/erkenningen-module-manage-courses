@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { useMutation } from '@apollo/client';
 import { gql } from 'apollo-boost';
 import { Dialog } from 'primereact/dialog';
 import { FormikProps, FormikHelpers } from 'formik';
@@ -8,7 +9,6 @@ import * as yup from 'yup';
 import { Button, Form, FormText, useGrowlContext, Alert } from '@erkenningen/ui';
 
 import FormSelectGql from 'components/FormSelectGql';
-import { useMutation } from '@apollo/react-hooks';
 import { SEARCH_LOCATIONS } from 'shared/Queries';
 
 const AddLocation: React.FC<{

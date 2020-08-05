@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { useLazyQuery, useMutation } from '@apollo/react-hooks';
+import { useLazyQuery, useMutation } from '@apollo/client';
 import { FormikProps, FormikHelpers } from 'formik';
 import * as yup from 'yup';
 

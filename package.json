@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@apollo/react-hooks": "^3.1.5",
+    "@apollo/client": "^3.1.2",
     "@erkenningen/config": "^1.0.7",
     "@erkenningen/ui": "^3.0.9",
     "@fortawesome/fontawesome-free": "^5.13.0",

@@ -70,20 +70,6 @@ const AddLocation: React.FC<{
     },
   );
 
-  const dialogFooter = (formikProps: FormikProps<any>) => {
-    return (
-      <div>
-        <Button
-          label={'Annuleren'}
-          buttonType="button"
-          type="secondary"
-          onClick={() => props.onHide}
-        />
-        <Button label={'Opslaan'} buttonType="submit" loading={formikProps.isSubmitting} />
-      </div>
-    );
-  };
-
   const onSubmitLocation = async (values: any, actions: FormikHelpers<any>) => {
     await addLocation({
       variables: {
@@ -138,7 +124,6 @@ const AddLocation: React.FC<{
           style={{ width: '50vw' }}
           modal={true}
           onHide={props.onHide}
-          footer={dialogFooter(formikProps)}
           visible={props.visible}
         >
           <FormText name={'Naam'} label={'Naam'} />
@@ -176,6 +161,16 @@ const AddLocation: React.FC<{
           <FormText name={'Contactgegevens.Email'} label={'E-mail'} />
           <FormText name={'Contactgegevens.Telefoon'} label={'Telefoon'} />
           <FormText name={'Contactgegevens.Website'} label={'Website'} />
+
+          <div className="col-sm-offset-4 col-md-offset-3">
+            <Button label={'Opslaan'} buttonType="submit" loading={formikProps.isSubmitting} />
+            <Button
+              label={'Annuleren'}
+              buttonType="button"
+              type="secondary"
+              onClick={() => props.onHide}
+            />
+          </div>
         </Dialog>
       )}
     </Form>

@@ -6,7 +6,10 @@ import { Dialog } from 'primereact/dialog';
 import { FormikProps, FormikHelpers } from 'formik';
 import * as yup from 'yup';
 
-import { Button, Form, FormText, useGrowlContext, Alert } from '@erkenningen/ui';
+import { Alert } from '@erkenningen/ui/components/alert';
+import { Button } from '@erkenningen/ui/components/button';
+import { Form, FormText } from '@erkenningen/ui/components/form';
+import { useGrowlContext } from '@erkenningen/ui/components/growl';
 
 import FormSelectGql from 'components/FormSelectGql';
 import { SEARCH_LOCATIONS } from 'shared/Queries';
@@ -110,6 +113,7 @@ const AddLocation: React.FC<{
           Email: '',
           Telefoon: '',
           Website: '',
+          Routebeschrijving: '',
         },
       }}
       validationSchema={yup.object({
@@ -122,6 +126,7 @@ const AddLocation: React.FC<{
           Woonplaats: yup.string().max(255).required(),
           Land: yup.string().required(),
           Email: yup.string().email().required(),
+          Routebeschrijving: yup.string().max(500),
         }),
       })}
       onSubmit={onSubmitLocation}

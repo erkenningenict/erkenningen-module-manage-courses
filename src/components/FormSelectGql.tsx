@@ -3,7 +3,7 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import { DocumentNode } from 'graphql';
 
-import { FormSelect } from '@erkenningen/ui';
+import { FormSelect } from '@erkenningen/ui/components/form';
 
 const FormSelectGql: React.FC<
   {

@@ -4,7 +4,10 @@ import { Switch, Route } from 'react-router-dom';
 import { FormatErrorParams } from 'yup';
 import * as yup from 'yup';
 
-import { Theme, ThemeContext, GrowlProvider } from '@erkenningen/ui/';
+import { GrowlProvider } from '@erkenningen/ui/components/growl';
+import { ThemeBureauErkenningen } from '@erkenningen/ui/layout/theme';
+import { ThemeContext } from '@erkenningen/ui/layout/theme';
+
 import { ERKENNINGEN_SITE_TYPE } from '@erkenningen/config';
 
 import CourseEdit from './courses/edit/CourseEdit';
@@ -40,16 +43,17 @@ const App: React.FC<{}> = (props) => {
   return (
     <ThemeContext.Provider value={{ mode: ERKENNINGEN_SITE_TYPE }}>
       <GrowlProvider>
-        <Theme>
+        <ThemeBureauErkenningen>
           <Switch>
-            <Route path="/edit" component={CourseEdit} />
-            <Route path="/new" component={CourseEdit} />
-            <Route path="/list">List courses</Route>
+            <Route path="/wijzig/:id" component={CourseEdit} />
+            <Route path="/nieuw" component={CourseEdit} />
+            <Route path="/overzicht">List courses</Route>
             <Route path="/">
-              Route not found, please set a route in the url hash (e.g. /edit or /new)
+              Route not found, please set a route in the url hash (e.g. /overzicht, /wijzig/1234 or
+              /nieuw)
             </Route>
           </Switch>
-        </Theme>
+        </ThemeBureauErkenningen>
       </GrowlProvider>
     </ThemeContext.Provider>
   );

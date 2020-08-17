@@ -4,17 +4,17 @@ import { useLazyQuery, useMutation } from '@apollo/client';
 import { FormikProps, FormikHelpers } from 'formik';
 import * as yup from 'yup';
 
+import { Alert } from '@erkenningen/ui/components/alert';
+import { Button } from '@erkenningen/ui/components/button';
 import {
-  Panel,
   FormText,
   FormCalendar,
   FormCheckbox,
   FormCurrency,
   FormItem,
-  Button,
-  toDutchDate,
-  Alert,
-} from '@erkenningen/ui';
+} from '@erkenningen/ui/components/form';
+import { Panel } from '@erkenningen/ui/layout/panel';
+import { toDutchDate } from '@erkenningen/ui/utils';
 
 import AddLocation from 'location/AddLocation';
 import FormSelectGql from 'components/FormSelectGql';

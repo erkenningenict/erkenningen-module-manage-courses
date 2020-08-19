@@ -8,11 +8,12 @@ import * as yup from 'yup';
 
 import { Alert } from '@erkenningen/ui/components/alert';
 import { Button } from '@erkenningen/ui/components/button';
-import { Form, FormText } from '@erkenningen/ui/components/form';
+import { Form, FormText, FormItem } from '@erkenningen/ui/components/form';
 import { useGrowlContext } from '@erkenningen/ui/components/growl';
 
 import FormSelectGql from 'components/FormSelectGql';
 import { SEARCH_LOCATIONS } from 'shared/Queries';
+import useWindowDimensions from 'shared/useWindowDimensions';
 
 const AddLocation: React.FC<{
   onHide: (LokatieID?: number) => void;
@@ -20,6 +21,9 @@ const AddLocation: React.FC<{
   vakgroepId?: number;
 }> = (props) => {
   const { showGrowl } = useGrowlContext();
+  const { width, height } = useWindowDimensions();
+  const dialogOverflow =
+    width < 400 || height < 400 ? { overflowY: 'auto' } : { overflowY: 'visible' };
   const [addLocation] = useMutation<any>(
     gql`
       mutation saveLocation($input: saveLocationInput!) {
@@ -39,6 +43,7 @@ const AddLocation: React.FC<{
         props.onHide(data.saveLocation.LokatieID);
       },
       onError(e) {
+        console.log(e);
         showGrowl({
           severity: 'error',
           summary: 'Locatie niet aangemaakt',
@@ -53,12 +58,12 @@ const AddLocation: React.FC<{
         }
         const locations: any = cache.readQuery({
           query: SEARCH_LOCATIONS,
-          variables: { VakgroepID: props.vakgroepId },
+          variables: { VakgroepID: parseInt(props.vakgroepId as any, 10) },
         });
 
         cache.writeQuery({
           query: SEARCH_LOCATIONS,
-          variables: { VakgroepID: props.vakgroepId },
+          variables: { VakgroepID: parseInt(props.vakgroepId as any, 10) },
           data: {
             SearchLocations: [
               { Text: location.Naam, Value: location.LokatieID, __typename: 'Lokatie' },
@@ -73,7 +78,7 @@ const AddLocation: React.FC<{
   const onSubmitLocation = async (values: any, actions: FormikHelpers<any>) => {
     await addLocation({
       variables: {
-        input: { ...values, VakgroepID: props.vakgroepId },
+        input: { ...values, VakgroepID: parseInt(props.vakgroepId as any, 10) },
       },
     });
 
@@ -89,6 +94,7 @@ const AddLocation: React.FC<{
       initialValues={{
         Naam: '',
         Routebeschrijving: '',
+        IsActief: true,
         Contactgegevens: {
           Adresregel1: '',
           Huisnummer: '',
@@ -96,10 +102,7 @@ const AddLocation: React.FC<{
           Postcode: '',
           Woonplaats: '',
           Land: 'Nederland',
-          Email: '',
           Telefoon: '',
-          Website: '',
-          Routebeschrijving: '',
         },
       }}
       validationSchema={yup.object({
@@ -111,8 +114,7 @@ const AddLocation: React.FC<{
           Postcode: yup.string().max(10).required(),
           Woonplaats: yup.string().max(255).required(),
           Land: yup.string().required(),
-          Email: yup.string().email().required(),
-          Routebeschrijving: yup.string().max(500),
+          Telefoon: yup.string().max(30),
         }),
       })}
       onSubmit={onSubmitLocation}
@@ -121,16 +123,18 @@ const AddLocation: React.FC<{
       {(formikProps: FormikProps<any>) => (
         <Dialog
           header="Locatie toevoegen"
-          style={{ width: '50vw' }}
           modal={true}
           onHide={props.onHide}
           visible={props.visible}
+          style={{ width: '50vw', ...dialogOverflow }}
+          maximized={width < 400}
+          blockScroll={true}
         >
-          <FormText name={'Naam'} label={'Naam'} />
-          <FormText name={'Contactgegevens.Adresregel1'} label={'Straat'} />
+          <FormText name={'Naam'} label={'Naam *'} />
+          <FormText name={'Contactgegevens.Adresregel1'} label={'Straat *'} />
           <FormText
             name={'Contactgegevens.Huisnummer'}
-            label={'Huisnummer'}
+            label={'Huisnummer *'}
             formControlClassName="col-sm-4"
           />
           <FormText
@@ -140,13 +144,13 @@ const AddLocation: React.FC<{
           />
           <FormText
             name={'Contactgegevens.Postcode'}
-            label={'Postcode'}
+            label={'Postcode *'}
             formControlClassName="col-sm-4"
           />
-          <FormText name={'Contactgegevens.Woonplaats'} label={'Woonplaats'} />
+          <FormText name={'Contactgegevens.Woonplaats'} label={'Woonplaats *'} />
           <FormSelectGql
             name={'Contactgegevens.Land'}
-            label={'Land'}
+            label={'Land *'}
             placeholder={'Selecteer een land'}
             filter={true}
             gqlQuery={gql`
@@ -158,19 +162,16 @@ const AddLocation: React.FC<{
               }
             `}
           />
-          <FormText name={'Contactgegevens.Email'} label={'E-mail'} />
           <FormText name={'Contactgegevens.Telefoon'} label={'Telefoon'} />
-          <FormText name={'Contactgegevens.Website'} label={'Website'} />
 
-          <div className="col-sm-offset-4 col-md-offset-3">
-            <Button label={'Opslaan'} buttonType="submit" loading={formikProps.isSubmitting} />
+          <FormItem label={' '}>
             <Button
-              label={'Annuleren'}
-              buttonType="button"
-              type="secondary"
-              onClick={() => props.onHide}
+              label={'Opslaan'}
+              buttonType="submit"
+              loading={formikProps.isSubmitting}
+              icon="pi pi-check"
             />
-          </div>
+          </FormItem>
         </Dialog>
       )}
     </Form>

@@ -4,6 +4,7 @@ import { Switch, Route } from 'react-router-dom';
 import { FormatErrorParams } from 'yup';
 import * as yup from 'yup';
 
+import { Alert } from '@erkenningen/ui/components/alert';
 import { GrowlProvider } from '@erkenningen/ui/components/growl';
 import { ThemeBureauErkenningen } from '@erkenningen/ui/layout/theme';
 import { ThemeContext } from '@erkenningen/ui/layout/theme';
@@ -11,6 +12,9 @@ import { ThemeContext } from '@erkenningen/ui/layout/theme';
 import { ERKENNINGEN_SITE_TYPE } from '@erkenningen/config';
 
 import CourseEdit from './courses/edit/CourseEdit';
+import CourseReady from './courses/ready/CourseReady';
+import { UserContext, useAuth, Roles, hasOneOfRoles } from './shared/Auth';
+import CourseNew from 'courses/edit/CourseNew';
 
 // @TODO Move to lib?
 yup.setLocale({
@@ -40,22 +44,48 @@ yup.setLocale({
 });
 
 const App: React.FC<{}> = (props) => {
+  const auth = useAuth();
+
+  if (auth.loading) {
+    return <p>Gegevens worden geladen...</p>;
+  }
+
+  if (auth.error) {
+    return (
+      <Alert type="danger">
+        Er is een fout opgetreden bij het ophalen van de accountgegevens. Probeer het nog een keer
+        of neem contact op met de helpdesk.
+      </Alert>
+    );
+  }
+
+  if (!auth.authenticated) {
+    return <Alert type="danger">U moet ingelogd zijn om het kennisaanbod te beheren.</Alert>;
+  }
+
+  if (!hasOneOfRoles([Roles.Rector, Roles.Hoogleraar], auth.data?.my.Roles)) {
+    return <Alert type="danger">U heeft geen toegang tot deze module.</Alert>;
+  }
+
   return (
-    <ThemeContext.Provider value={{ mode: ERKENNINGEN_SITE_TYPE }}>
-      <GrowlProvider>
-        <ThemeBureauErkenningen>
-          <Switch>
-            <Route path="/wijzig/:id" component={CourseEdit} />
-            <Route path="/nieuw" component={CourseEdit} />
-            <Route path="/overzicht">List courses</Route>
-            <Route path="/">
-              Route not found, please set a route in the url hash (e.g. /overzicht, /wijzig/1234 or
-              /nieuw)
-            </Route>
-          </Switch>
-        </ThemeBureauErkenningen>
-      </GrowlProvider>
-    </ThemeContext.Provider>
+    <UserContext.Provider value={auth.data}>
+      <ThemeContext.Provider value={{ mode: ERKENNINGEN_SITE_TYPE }}>
+        <GrowlProvider>
+          <ThemeBureauErkenningen>
+            <Switch>
+              <Route path="/wijzig/:id" component={CourseEdit} />
+              <Route path="/nieuw" component={CourseNew} />
+              <Route path="/gereed" component={CourseReady} />
+              <Route path="/overzicht">List courses</Route>
+              <Route path="/">
+                Route not found, please set a route in the url hash (e.g. /overzicht, /wijzig/1234
+                or /nieuw)
+              </Route>
+            </Switch>
+          </ThemeBureauErkenningen>
+        </GrowlProvider>
+      </ThemeContext.Provider>
+    </UserContext.Provider>
   );
 };
 

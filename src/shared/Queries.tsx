@@ -46,8 +46,14 @@ export const GET_SPECIALTY = gql`
   query Specialty($vakId: Int!) {
     Specialty(vakId: $vakId) {
       VakID
+      VakgroepID
+      Code
+      Titel
+      Promotietekst
+      Kosten
       MinimumDatum
       MaximumDatum
+      MaximumCursisten
     }
   }
 `;
@@ -59,3 +65,26 @@ export const CREATE_COURSE = gql`
     }
   }
 `;
+
+export const GET_MY_PERSON_QUERY = gql`
+  query getMy {
+    my {
+      Roles
+      Persoon {
+        PersoonID
+      }
+    }
+  }
+`;
+
+export interface IMy {
+  my: {
+    Roles: string[];
+    Persoon?: IPersoon;
+  };
+}
+
+export interface IPersoon {
+  __typename: 'Persoon';
+  PersoonID: string;
+}

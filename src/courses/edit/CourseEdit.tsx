@@ -1,6 +1,5 @@
 import React, { useState, useContext } from 'react';
 
-import { useMutation, useQuery } from '@apollo/client';
 import { Button } from '@erkenningen/ui/components/button';
 import { FormikProps, FormikHelpers } from 'formik';
 import { addDays, addYears, subDays } from 'date-fns';
@@ -21,9 +20,13 @@ import { toDutchDate } from '@erkenningen/ui/utils';
 
 import AddLocation from 'location/AddLocation';
 import FormSelectGql from 'components/FormSelectGql';
-import { SEARCH_LOCATIONS, GET_SPECIALTY, CREATE_COURSE } from 'shared/Queries';
 import { hasRole, Roles, UserContext } from 'shared/Auth';
 import Form from 'components/Form';
+import {
+  SearchLocationsDocument,
+  useSpecialtyQuery,
+  useCreateCourseMutation,
+} from 'generated/graphql';
 
 const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
   const [showAddLocationDialog, setShowAddLocationDialog] = useState<boolean>(false);
@@ -31,7 +34,8 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
   const { clearGrowl, showGrowl } = useGrowlContext();
   const user = useContext(UserContext);
   const history = useHistory();
-  const { loading: specialtyLoading, data: specialty } = useQuery(GET_SPECIALTY, {
+
+  const { loading: specialtyLoading, data: specialty } = useSpecialtyQuery({
     variables: { vakId: props.specialtyId },
     onError() {
       showGrowl({
@@ -43,8 +47,8 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
     },
   });
 
-  const [createCourse] = useMutation(CREATE_COURSE, {
-    onCompleted(data: any) {
+  const [createCourse] = useCreateCourseMutation({
+    onCompleted(data) {
       showGrowl({
         severity: 'success',
         summary: 'Bijeenkomst aangemaakt',
@@ -120,7 +124,12 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
           Docent: ['', yup.string()],
         }}
         onSubmit={async (values, actions: FormikHelpers<any>) => {
+          if (!specialty.Specialty) {
+            return;
+          }
+
           clearGrowl();
+
           await createCourse({
             variables: {
               input: {
@@ -145,8 +154,8 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
           <>
             <Panel title="Bijeenkomst" className="form-horizontal">
               <p>
-                Kennisaanbod geldig van {toDutchDate(specialty.Specialty.MinimumDatum)} t/m{' '}
-                {toDutchDate(specialty.Specialty.MaximumDatum)}
+                Kennisaanbod geldig van {toDutchDate(specialty.Specialty?.MinimumDatum)} t/m{' '}
+                {toDutchDate(specialty.Specialty?.MaximumDatum)}
               </p>
               <FormText name={'Titel'} label={'Titel *'} />
               <FormText name={'Promotietekst'} label={'Promotietekst *'} isTextArea={true} />
@@ -169,7 +178,7 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                 label={'Datum *'}
                 formControlClassName="col-sm-3"
                 minDate={
-                  hasRole(Roles.Rector, user?.my?.Roles)
+                  hasRole(Roles.Rector, user?.Roles)
                     ? subDays(new Date(), 100)
                     : addDays(new Date(), 7)
                 }
@@ -195,8 +204,8 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                 placeholder={'Selecteer een locatie'}
                 formControlClassName="col-sm-5"
                 filter={true}
-                gqlQuery={SEARCH_LOCATIONS}
-                variables={{ VakgroepID: specialty.Specialty.VakgroepID }}
+                gqlQuery={SearchLocationsDocument}
+                variables={{ VakgroepID: specialty.Specialty?.VakgroepID }}
               >
                 <Button
                   className="mr-2"

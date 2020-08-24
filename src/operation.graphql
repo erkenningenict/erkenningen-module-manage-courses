@@ -1,0 +1,71 @@
+query getMy {
+  my {
+    Roles
+    Persoon {
+      PersoonID
+    }
+  }
+}
+
+query SearchLocations($VakgroepID: Int!) {
+  SearchLocations(input: { VakgroepID: $VakgroepID }) {
+    Text: Naam
+    Value: LokatieID
+  }
+}
+
+query SearchOrganizers {
+  SearchOrganizers {
+    Text: Naam
+    Value: VakgroepID
+  }
+}
+
+query Specialties($vakgroepId: Int!) {
+  Specialties(input: { vakgroepId: $vakgroepId }) {
+    VakID
+    Afkorting
+    Code
+    Titel
+    Kosten
+    MinimumDatum
+    MaximumDatum
+    Competenties {
+      Naam
+      Code
+    }
+    Themas {
+      Naam
+      Code
+    }
+    Promotietekst
+    DigitaalAanbod
+  }
+}
+
+query Specialty($vakId: Int!) {
+  Specialty(vakId: $vakId) {
+    VakID
+    VakgroepID
+    Code
+    Titel
+    Promotietekst
+    Kosten
+    MinimumDatum
+    MaximumDatum
+    MaximumCursisten
+  }
+}
+
+mutation createCourse($input: CreateCourseInput!) {
+  createCourse(input: $input) {
+    CursusID
+  }
+}
+
+mutation saveLocation($input: saveLocationInput!) {
+  saveLocation(input: $input) {
+    LokatieID
+    Naam
+  }
+}

@@ -63,12 +63,12 @@ const App: React.FC<{}> = (props) => {
     return <Alert type="danger">U moet ingelogd zijn om het kennisaanbod te beheren.</Alert>;
   }
 
-  if (!hasOneOfRoles([Roles.Rector, Roles.Hoogleraar], auth.data?.my.Roles)) {
+  if (!hasOneOfRoles([Roles.Rector, Roles.Hoogleraar], auth.my?.Roles)) {
     return <Alert type="danger">U heeft geen toegang tot deze module.</Alert>;
   }
 
   return (
-    <UserContext.Provider value={auth.data}>
+    <UserContext.Provider value={auth.my}>
       <ThemeContext.Provider value={{ mode: ERKENNINGEN_SITE_TYPE }}>
         <GrowlProvider>
           <ThemeBureauErkenningen>

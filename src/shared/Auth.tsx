@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { IMy, GET_MY_PERSON_QUERY } from './Queries';
-import { useQuery } from '@apollo/client';
+import { DeepPartial } from 'ts-essentials';
+
+import { useGetMyQuery, My } from 'generated/graphql';
 
 // @TODO: Promote to erkenningen/auth library?
 
@@ -15,15 +16,15 @@ export enum Roles {
   Student = 'Student',
 }
 
-export const UserContext = React.createContext<IMy | undefined>(undefined);
+export const UserContext = React.createContext<DeepPartial<My> | undefined>(undefined);
 
 export const useAuth = (): {
   loading: boolean;
   error: boolean;
   authenticated: boolean;
-  data?: IMy;
+  my?: DeepPartial<My>;
 } => {
-  const { loading, error, data } = useQuery<IMy>(GET_MY_PERSON_QUERY);
+  const { loading, error, data } = useGetMyQuery();
 
   let authenticated = false;
   let hasError = false;
@@ -41,13 +42,13 @@ export const useAuth = (): {
     authenticated = true;
   }
 
-  return { loading, error: hasError, authenticated, data };
+  return { loading, error: hasError, authenticated, my: data?.my };
 };
 
 export const hasRole = (role: Roles, currentRoles?: string[]): boolean =>
   currentRoles ? currentRoles.includes(role) : false;
 
-export const hasOneOfRoles = (roles: Roles[], currentRoles?: string[]): boolean =>
+export const hasOneOfRoles = (roles: Roles[], currentRoles?: string | string[]): boolean =>
   currentRoles ? roles.some((role: Roles) => currentRoles.includes(role)) : false;
 
 export const hasAllRoles = (roles: Roles[], currentRoles?: string[]): boolean =>

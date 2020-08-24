@@ -9,15 +9,14 @@ import { Spinner } from '@erkenningen/ui/components/spinner';
 import { toDutchDate } from '@erkenningen/ui/utils';
 import { useGrowlContext } from '@erkenningen/ui/components/growl';
 
-import { LIST_ORGANIZERS, LIST_SPECIALTIES } from 'shared/Queries';
 import FormSelectGql from 'components/FormSelectGql';
 import Form from 'components/Form';
 import CourseEdit from './CourseEdit';
-import { useQuery } from '@apollo/client';
+import { useSearchOrganizersQuery, SpecialtiesDocument } from 'generated/graphql';
 
 const CourseNew: React.FC<{}> = () => {
   const { showGrowl } = useGrowlContext();
-  const { loading: organizersLoading, data: organizers } = useQuery(LIST_ORGANIZERS, {
+  const { loading: organizersLoading, data: organizers } = useSearchOrganizersQuery({
     onError() {
       showGrowl({
         severity: 'error',
@@ -51,7 +50,7 @@ const CourseNew: React.FC<{}> = () => {
         {(formikProps: FormikProps<any>) => (
           <>
             <Panel title="Nieuwe bijeenkomst maken en plannen">
-              {organizers.SearchOrganizers.length > 1 && (
+              {organizers.SearchOrganizers && organizers.SearchOrganizers.length > 1 && (
                 <FormSelect
                   labelClassNames="col-sm-12 text-left"
                   placeholder={'Selecteer een kennisaanbieder'}
@@ -70,14 +69,14 @@ const CourseNew: React.FC<{}> = () => {
                   }}
                 />
               )}
-              {(formikProps.values.VakgroepID || organizers.SearchOrganizers.length === 1) && (
+              {(formikProps.values.VakgroepID || organizers.SearchOrganizers?.length === 1) && (
                 <FormSelectGql
                   labelClassNames="col-sm-12 text-left"
                   placeholder={'Selecteer een kennisaanbod'}
                   name={'VakID'}
                   label={'Kies het kennisaanbod waarop u de nieuwe bijeenkomst wilt baseren:'}
                   filter={true}
-                  gqlQuery={LIST_SPECIALTIES}
+                  gqlQuery={SpecialtiesDocument}
                   mapResult={(data: any) =>
                     data.Specialties.map((item: any) => ({
                       label: `${item.VakID} | geldig tot: ${toDutchDate(
@@ -90,7 +89,12 @@ const CourseNew: React.FC<{}> = () => {
                   }
                   variables={{
                     vakgroepId:
-                      +formikProps.values.VakgroepID || +organizers.SearchOrganizers[0].Value,
+                      +formikProps.values.VakgroepID ||
+                      +(
+                        (organizers.SearchOrganizers?.length &&
+                          organizers.SearchOrganizers[0].Value) ||
+                        0
+                      ),
                   }}
                   onChange={(e) => setSpecialtyId(+e.value)}
                   value={specialtyId}

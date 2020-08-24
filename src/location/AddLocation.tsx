@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { useMutation } from '@apollo/client';
 import { gql } from 'apollo-boost';
 import { Dialog } from 'primereact/dialog';
 import { FormikProps, FormikHelpers } from 'formik';
@@ -12,8 +11,12 @@ import { Form, FormText, FormItem } from '@erkenningen/ui/components/form';
 import { useGrowlContext } from '@erkenningen/ui/components/growl';
 
 import FormSelectGql from 'components/FormSelectGql';
-import { SEARCH_LOCATIONS } from 'shared/Queries';
 import useWindowDimensions from 'shared/useWindowDimensions';
+import {
+  SearchLocationsDocument,
+  SearchLocationsQuery,
+  useSaveLocationMutation,
+} from 'generated/graphql';
 
 const AddLocation: React.FC<{
   onHide: (LokatieID?: number) => void;
@@ -24,55 +27,45 @@ const AddLocation: React.FC<{
   const { width, height } = useWindowDimensions();
   const dialogOverflow =
     width < 400 || height < 400 ? { overflowY: 'auto' } : { overflowY: 'visible' };
-  const [addLocation] = useMutation<any>(
-    gql`
-      mutation saveLocation($input: saveLocationInput!) {
-        saveLocation(input: $input) {
-          LokatieID
-          Naam
-        }
-      }
-    `,
-    {
-      onCompleted(data: any) {
-        showGrowl({
-          severity: 'success',
-          summary: 'Locatie aangemaakt',
-          detail: 'Locatie is succesvol aangemaakt',
-        });
-        props.onHide(data.saveLocation.LokatieID);
-      },
-      onError(e) {
-        showGrowl({
-          severity: 'error',
-          summary: 'Locatie niet aangemaakt',
-          detail:
-            'Er is een fout opgetreden bij het aanmaken van de locatie. Controleer uw invoer of neem contact op met Bureau Erkenningen',
-        });
-      },
-      update(cache, result) {
-        const location = result?.data?.saveLocation;
-        if (!location) {
-          return;
-        }
-        const locations: any = cache.readQuery({
-          query: SEARCH_LOCATIONS,
-          variables: { VakgroepID: parseInt(props.vakgroepId as any, 10) },
-        });
-
-        cache.writeQuery({
-          query: SEARCH_LOCATIONS,
-          variables: { VakgroepID: parseInt(props.vakgroepId as any, 10) },
-          data: {
-            SearchLocations: [
-              { Text: location.Naam, Value: location.LokatieID, __typename: 'Lokatie' },
-              ...locations.SearchLocations,
-            ],
-          },
-        });
-      },
+  const [addLocation] = useSaveLocationMutation({
+    onCompleted(data: any) {
+      showGrowl({
+        severity: 'success',
+        summary: 'Locatie aangemaakt',
+        detail: 'Locatie is succesvol aangemaakt',
+      });
+      props.onHide(data.saveLocation.LokatieID);
     },
-  );
+    onError(e) {
+      showGrowl({
+        severity: 'error',
+        summary: 'Locatie niet aangemaakt',
+        detail:
+          'Er is een fout opgetreden bij het aanmaken van de locatie. Controleer uw invoer of neem contact op met Bureau Erkenningen',
+      });
+    },
+    update(cache, result) {
+      const location = result?.data?.saveLocation;
+      if (!location) {
+        return;
+      }
+      const locations: any = cache.readQuery<SearchLocationsQuery>({
+        query: SearchLocationsDocument,
+        variables: { VakgroepID: parseInt(props.vakgroepId as any, 10) },
+      });
+
+      cache.writeQuery<SearchLocationsQuery>({
+        query: SearchLocationsDocument,
+        variables: { VakgroepID: parseInt(props.vakgroepId as any, 10) },
+        data: {
+          SearchLocations: [
+            { Text: location.Naam, Value: location.LokatieID, __typename: 'Lokatie' },
+            ...locations.SearchLocations,
+          ],
+        },
+      });
+    },
+  });
 
   const onSubmitLocation = async (values: any, actions: FormikHelpers<any>) => {
     await addLocation({

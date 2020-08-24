@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
 import { useMutation, useQuery } from '@apollo/client';
 import { Button } from '@erkenningen/ui/components/button';
 import { FormikProps, FormikHelpers } from 'formik';
-import { addDays, addYears } from 'date-fns';
+import { addDays, addYears, subDays } from 'date-fns';
 import * as yup from 'yup';
+import { useHistory } from 'react-router-dom';
 
 import {
   FormText,
@@ -16,19 +17,19 @@ import {
 import { Spinner } from '@erkenningen/ui/components/spinner';
 import { Panel } from '@erkenningen/ui/layout/panel';
 import { useGrowlContext } from '@erkenningen/ui/components/growl';
+import { toDutchDate } from '@erkenningen/ui/utils';
 
 import AddLocation from 'location/AddLocation';
 import FormSelectGql from 'components/FormSelectGql';
 import { SEARCH_LOCATIONS, GET_SPECIALTY, CREATE_COURSE } from 'shared/Queries';
-
+import { hasRole, Roles, UserContext } from 'shared/Auth';
 import Form from 'components/Form';
-import { useHistory } from 'react-router-dom';
-import { toDutchDate } from '@erkenningen/ui/utils';
 
 const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
   const [showAddLocationDialog, setShowAddLocationDialog] = useState<boolean>(false);
   const [currentForm, setCurrentForm] = useState<FormikProps<any>>();
   const { clearGrowl, showGrowl } = useGrowlContext();
+  const user = useContext(UserContext);
   const history = useHistory();
   const { loading: specialtyLoading, data: specialty } = useQuery(GET_SPECIALTY, {
     variables: { vakId: props.specialtyId },
@@ -111,7 +112,10 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                 /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/g,
                 'Tijd moet in uu:mm formaat, bijv. 15:30',
               )
-              .required(),
+              .required()
+              .test('greaterThan', 'Eindtijd moet na begintijd liggen', function (v) {
+                return !v || this.resolve(yup.ref('Begintijd')) < v;
+              }),
           ],
           Docent: ['', yup.string()],
         }}
@@ -135,8 +139,6 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
               },
             },
           });
-
-          actions.setSubmitting(false);
         }}
       >
         {(formikProps: FormikProps<any>) => (
@@ -166,7 +168,11 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                 name={'Datum'}
                 label={'Datum *'}
                 formControlClassName="col-sm-3"
-                minDate={addDays(new Date(), 7)}
+                minDate={
+                  hasRole(Roles.Rector, user?.my?.Roles)
+                    ? subDays(new Date(), 100)
+                    : addDays(new Date(), 7)
+                }
                 maxDate={addYears(new Date(), 50)}
               />
               <FormText

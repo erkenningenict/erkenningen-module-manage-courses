@@ -43,7 +43,6 @@ const AddLocation: React.FC<{
         props.onHide(data.saveLocation.LokatieID);
       },
       onError(e) {
-        console.log(e);
         showGrowl({
           severity: 'error',
           summary: 'Locatie niet aangemaakt',

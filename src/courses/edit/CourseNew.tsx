@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { FormikProps } from 'formik';
 import * as yup from 'yup';
@@ -27,6 +27,7 @@ const CourseNew: React.FC<{}> = () => {
       });
     },
   });
+  const [specialtyId, setSpecialtyId] = useState<number | undefined>(undefined);
 
   if (organizersLoading) {
     return <Spinner text={'Gegevens laden...'} />;
@@ -63,6 +64,10 @@ const CourseNew: React.FC<{}> = () => {
                       value: item.Value,
                     })) || []
                   }
+                  onChange={(e) => {
+                    formikProps.setFieldValue('VakID', undefined);
+                    setSpecialtyId(undefined);
+                  }}
                 />
               )}
               {(formikProps.values.VakgroepID || organizers.SearchOrganizers.length === 1) && (
@@ -87,15 +92,15 @@ const CourseNew: React.FC<{}> = () => {
                     vakgroepId:
                       +formikProps.values.VakgroepID || +organizers.SearchOrganizers[0].Value,
                   }}
+                  onChange={(e) => setSpecialtyId(+e.value)}
+                  value={specialtyId}
                 />
               )}
             </Panel>
-            {formikProps.values.VakID && (
-              <CourseEdit specialtyId={+formikProps.values.VakID}></CourseEdit>
-            )}
           </>
         )}
       </Form>
+      {specialtyId && <CourseEdit specialtyId={specialtyId}></CourseEdit>}
     </>
   );
 };

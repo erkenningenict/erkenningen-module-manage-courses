@@ -77,7 +77,8 @@ const App: React.FC<{}> = (props) => {
               <Route path="/nieuw" component={CourseNew} />
               <Route path="/gereed" component={CourseReady} />
               <Route path="/overzicht">List courses</Route>
-              <Route path="/">
+              <Route path="/" component={CourseNew} />
+              <Route>
                 Route not found, please set a route in the url hash (e.g. /overzicht, /wijzig/1234
                 or /nieuw)
               </Route>

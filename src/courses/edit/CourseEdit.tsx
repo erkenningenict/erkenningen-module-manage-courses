@@ -96,7 +96,7 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
           Prijs: [specialty.Specialty.Kosten, yup.number().required()],
           IsBesloten: [false, yup.boolean().required()],
           MaximumCursisten: [specialty.Specialty.MaximumCursisten, yup.number().required()],
-          Opmerkingen: ['', yup.string().max(1000).required()],
+          Opmerkingen: ['', yup.string().max(1000)],
           Datum: [null, yup.date().required()],
           Begintijd: [
             null,
@@ -172,7 +172,7 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                 placeholder={'1'}
               />
               <FormCheckbox name={'IsBesloten'} label={'Besloten'} />
-              <FormText name={'Opmerkingen'} label={'Opmerkingen *'} isTextArea={true} />
+              <FormText name={'Opmerkingen'} label={'Opmerkingen'} isTextArea={true} />
               <FormCalendar
                 name={'Datum'}
                 label={'Datum *'}

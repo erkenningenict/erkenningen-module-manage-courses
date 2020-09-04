@@ -1,13 +1,33 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import App from "./App";
-import * as serviceWorker from "./serviceWorker";
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+import { HashRouter } from 'react-router-dom';
+import { ApolloClient, ApolloProvider, HttpLink, InMemoryCache } from '@apollo/client';
+
+import { ERKENNINGEN_GRAPHQL_API_URL } from '@erkenningen/config';
+
+import App from './App';
+import * as serviceWorker from './serviceWorker';
+
+const cache = new InMemoryCache();
+
+const client = new ApolloClient({
+  link: new HttpLink({
+    uri: ERKENNINGEN_GRAPHQL_API_URL,
+    credentials: 'include',
+  }),
+  cache,
+});
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <ApolloProvider client={client}>
+      <HashRouter>
+        <App />
+      </HashRouter>
+    </ApolloProvider>
   </React.StrictMode>,
-  document.getElementById("root")
+  document.getElementById('erkenningen-module-manage-courses'),
 );
 
 // If you want your app to work offline and load faster, you can change

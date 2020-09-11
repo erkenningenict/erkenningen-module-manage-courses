@@ -23,8 +23,8 @@ export type Scalars = {
 
 export type Query = {
   __typename?: 'Query';
-  Certificeringen?: Maybe<Array<Maybe<Certificering>>>;
   Certificaten?: Maybe<Array<Maybe<Certificaat>>>;
+  Certificeringen?: Maybe<Array<Maybe<Certificering>>>;
   Competenties: Array<Maybe<Competentie>>;
   Contactgegevens?: Maybe<Contactgegevens>;
   /** In the input, either specialtyId or courseId must be supplied */
@@ -66,13 +66,13 @@ export type Query = {
 };
 
 
-export type QueryCertificeringenArgs = {
-  personId: Scalars['Int'];
+export type QueryCertificatenArgs = {
+  idList?: Maybe<Array<Scalars['Int']>>;
 };
 
 
-export type QueryCertificatenArgs = {
-  idList?: Maybe<Array<Scalars['Int']>>;
+export type QueryCertificeringenArgs = {
+  personId: Scalars['Int'];
 };
 
 
@@ -161,6 +161,13 @@ export type QueryCertificatesByPreEducationArgs = {
   code: Scalars['String'];
 };
 
+export type Certificaat = {
+  __typename?: 'Certificaat';
+  CertificaatID: Scalars['ID'];
+  Code: Scalars['String'];
+  Naam: Scalars['String'];
+};
+
 export type Certificering = {
   __typename?: 'Certificering';
   CertificeringID: Scalars['ID'];
@@ -186,13 +193,6 @@ export type Certificering = {
   Passen?: Maybe<Array<Maybe<Pas>>>;
 };
 
-
-export type Certificaat = {
-  __typename?: 'Certificaat';
-  CertificaatID: Scalars['ID'];
-  Code: Scalars['String'];
-  Naam: Scalars['String'];
-};
 
 export type CertificeringAantekening = {
   __typename?: 'CertificeringAantekening';
@@ -334,6 +334,10 @@ export type ExamenInstelling = {
   IsActief: Scalars['Boolean'];
   Code: Scalars['String'];
   Contactgegevens: Contactgegevens;
+  UniversiteitID: Scalars['Int'];
+  ContactgegevensID: Scalars['Int'];
+  WebserviceEnabled: Scalars['Boolean'];
+  ApiKey?: Maybe<Scalars['String']>;
 };
 
 export type OrderByArgs = {
@@ -458,14 +462,14 @@ export type Landen = {
 
 export type SearchLocationsInput = {
   VakgroepID?: Maybe<Scalars['Int']>;
-  ExameninstellingID?: Maybe<Scalars['Int']>;
+  ExamenInstellingID?: Maybe<Scalars['Int']>;
 };
 
 export type Lokatie = {
   __typename?: 'Lokatie';
   LokatieID: Scalars['ID'];
   VakgroepID?: Maybe<Scalars['Int']>;
-  ExameninstellingID?: Maybe<Scalars['Int']>;
+  ExamenInstellingID?: Maybe<Scalars['Int']>;
   ContactgegevensID?: Maybe<Scalars['Int']>;
   Naam: Scalars['String'];
   Routebeschrijving: Scalars['String'];
@@ -606,7 +610,7 @@ export type Vak = {
   __typename?: 'Vak';
   VakID: Scalars['ID'];
   VakgroepID?: Maybe<Scalars['Int']>;
-  ExameninstellingID?: Maybe<Scalars['Int']>;
+  ExamenInstellingID?: Maybe<Scalars['Int']>;
   Afkorting?: Maybe<Scalars['String']>;
   Code?: Maybe<Scalars['String']>;
   Titel?: Maybe<Scalars['String']>;
@@ -621,7 +625,7 @@ export type Vak = {
   Competenties?: Maybe<Array<Maybe<Competentie>>>;
   Themas?: Maybe<Array<Maybe<Thema>>>;
   Vakgroep?: Maybe<Vakgroep>;
-  Exameninstelling?: Maybe<Exameninstelling>;
+  ExamenInstelling?: Maybe<ExamenInstelling>;
 };
 
 export type Thema = {
@@ -635,20 +639,6 @@ export type Thema = {
 export type Vakgroep = {
   __typename?: 'Vakgroep';
   VakgroepID: Scalars['ID'];
-  UniversiteitID: Scalars['Int'];
-  ContactgegevensID: Scalars['Int'];
-  Naam: Scalars['String'];
-  Code: Scalars['String'];
-  IsBtwPlichtig: Scalars['Boolean'];
-  IsActief: Scalars['Boolean'];
-  WebserviceEnabled: Scalars['Boolean'];
-  ApiKey?: Maybe<Scalars['String']>;
-  Contactgegevens: Contactgegevens;
-};
-
-export type Exameninstelling = {
-  __typename?: 'Exameninstelling';
-  ExameninstellingID: Scalars['ID'];
   UniversiteitID: Scalars['Int'];
   ContactgegevensID: Scalars['Int'];
   Naam: Scalars['String'];
@@ -713,7 +703,7 @@ export type ExamenInstellingLink = {
   ExamenInstellingID: Scalars['Int'];
   PersoonID: Scalars['Int'];
   Actief: Scalars['Boolean'];
-  ExamenInstelling?: Maybe<Exameninstelling>;
+  ExamenInstelling?: Maybe<ExamenInstelling>;
 };
 
 export type Nationaliteiten = {
@@ -1019,17 +1009,17 @@ export type UnRegisterResult = {
 
 export type CreateCourseInput = {
   VakID: Scalars['Int'];
-  Titel: Scalars['String'];
-  Promotietekst: Scalars['String'];
+  Titel: Scalars['SafeString'];
+  Promotietekst: Scalars['SafeString'];
   Prijs: Scalars['Float'];
   MaximumCursisten: Scalars['Int'];
   IsBesloten: Scalars['Boolean'];
-  Opmerkingen: Scalars['String'];
+  Opmerkingen?: Maybe<Scalars['SafeString']>;
   Datum: Scalars['Date'];
   Begintijd: Scalars['Date'];
   Eindtijd: Scalars['Date'];
   LokatieID: Scalars['Int'];
-  Docent: Scalars['String'];
+  Docent?: Maybe<Scalars['SafeString']>;
 };
 
 export type DecoupleLicenseInput = {
@@ -1101,24 +1091,24 @@ export type CreateInvoiceCollectionResult = {
 export type SaveLocationInput = {
   LokatieID?: Maybe<Scalars['Int']>;
   VakgroepID?: Maybe<Scalars['Int']>;
-  ExameninstellingID?: Maybe<Scalars['Int']>;
+  ExamenInstellingID?: Maybe<Scalars['Int']>;
   ContactgegevensID?: Maybe<Scalars['Int']>;
-  Naam: Scalars['String'];
-  Routebeschrijving: Scalars['String'];
+  Naam: Scalars['SafeString'];
+  Routebeschrijving?: Maybe<Scalars['SafeString']>;
   IsActief: Scalars['Boolean'];
   Contactgegevens?: Maybe<ContactgegevensInput>;
 };
 
 export type ContactgegevensInput = {
-  Adresregel1: Scalars['String'];
-  Huisnummer: Scalars['String'];
-  HuisnummerToevoeging?: Maybe<Scalars['String']>;
-  Postcode: Scalars['String'];
-  Woonplaats: Scalars['String'];
-  Land: Scalars['String'];
-  Email?: Maybe<Scalars['String']>;
-  Telefoon?: Maybe<Scalars['String']>;
-  Website?: Maybe<Scalars['String']>;
+  Adresregel1: Scalars['SafeString'];
+  Huisnummer: Scalars['SafeString'];
+  HuisnummerToevoeging?: Maybe<Scalars['SafeString']>;
+  Postcode: Scalars['SafeString'];
+  Woonplaats: Scalars['SafeString'];
+  Land: Scalars['SafeString'];
+  Email?: Maybe<Scalars['SafeString']>;
+  Telefoon?: Maybe<Scalars['SafeString']>;
+  Website?: Maybe<Scalars['SafeString']>;
 };
 
 export type CheckForExistingPersonByBsnResult = {

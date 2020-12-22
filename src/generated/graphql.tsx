@@ -1264,7 +1264,11 @@ export type SearchLocationsQuery = (
   { __typename?: 'Query' }
   & { SearchLocations?: Maybe<Array<Maybe<(
     { __typename?: 'Lokatie' }
-    & { Text: Lokatie['Naam'], Value: Lokatie['LokatieID'] }
+    & Pick<Lokatie, 'LokatieID' | 'Naam'>
+    & { Contactgegevens: (
+      { __typename?: 'Contactgegevens' }
+      & Pick<Contactgegevens, 'Woonplaats'>
+    ) }
   )>>> }
 );
 
@@ -1377,8 +1381,11 @@ export type GetMyQueryResult = Apollo.QueryResult<GetMyQuery, GetMyQueryVariable
 export const SearchLocationsDocument = gql`
     query SearchLocations($VakgroepID: Int!) {
   SearchLocations(input: {VakgroepID: $VakgroepID}) {
-    Text: Naam
-    Value: LokatieID
+    LokatieID
+    Naam
+    Contactgegevens {
+      Woonplaats
+    }
   }
 }
     `;

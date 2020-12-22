@@ -58,10 +58,7 @@ const AddLocation: React.FC<{
         query: SearchLocationsDocument,
         variables: { VakgroepID: parseInt(props.vakgroepId as any, 10) },
         data: {
-          SearchLocations: [
-            { Text: location.Naam, Value: location.LokatieID, __typename: 'Lokatie' },
-            ...locations.SearchLocations,
-          ],
+          SearchLocations: [{ ...location, __typename: 'Lokatie' }, ...locations.SearchLocations],
         },
       });
     },

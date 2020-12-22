@@ -9,8 +9,11 @@ query getMy {
 
 query SearchLocations($VakgroepID: Int!) {
   SearchLocations(input: { VakgroepID: $VakgroepID }) {
-    Text: Naam
-    Value: LokatieID
+    LokatieID
+    Naam
+    Contactgegevens {
+      Woonplaats
+    }
   }
 }
 

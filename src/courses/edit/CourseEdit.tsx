@@ -26,6 +26,7 @@ import {
   SearchLocationsDocument,
   useSpecialtyQuery,
   useCreateCourseMutation,
+  SearchLocationsQuery,
 } from 'generated/graphql';
 
 const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
@@ -204,6 +205,18 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                 placeholder={'Selecteer een locatie'}
                 formControlClassName="col-sm-5"
                 filter={true}
+                mapResult={(data: SearchLocationsQuery) => {
+                  return (
+                    data.SearchLocations?.map((location) => ({
+                      label: `${location.Naam}${
+                        location.Contactgegevens?.Woonplaats
+                          ? ' | ' + location.Contactgegevens?.Woonplaats
+                          : ''
+                      }`,
+                      value: location.LokatieID,
+                    })) || []
+                  );
+                }}
                 gqlQuery={SearchLocationsDocument}
                 variables={{ VakgroepID: specialty.Specialty?.VakgroepID }}
               >

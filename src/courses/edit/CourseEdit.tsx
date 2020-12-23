@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 
 import { Button } from '@erkenningen/ui/components/button';
 import { FormikProps, FormikHelpers } from 'formik';
-import { addDays, addYears, subDays } from 'date-fns';
+import { addBusinessDays, addYears, subDays } from 'date-fns';
 import * as yup from 'yup';
 import { useHistory } from 'react-router-dom';
 
@@ -181,7 +181,7 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                 minDate={
                   hasRole(Roles.Rector, user?.Roles)
                     ? subDays(new Date(), 100)
-                    : addDays(new Date(), 7)
+                    : addBusinessDays(new Date(), 4)
                 }
                 maxDate={addYears(new Date(), 50)}
               />

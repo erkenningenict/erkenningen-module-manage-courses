@@ -70,8 +70,8 @@ const App: React.FC<{}> = (props) => {
   return (
     <UserContext.Provider value={auth.my}>
       <ThemeContext.Provider value={{ mode: ERKENNINGEN_SITE_TYPE }}>
-        <GrowlProvider>
-          <ThemeBureauErkenningen>
+        <ThemeBureauErkenningen>
+          <GrowlProvider>
             <Switch>
               <Route path="/wijzig/:id" component={CourseEdit} />
               <Route path="/nieuw" component={CourseNew} />
@@ -83,8 +83,8 @@ const App: React.FC<{}> = (props) => {
                 or /nieuw)
               </Route>
             </Switch>
-          </ThemeBureauErkenningen>
-        </GrowlProvider>
+          </GrowlProvider>
+        </ThemeBureauErkenningen>
       </ThemeContext.Provider>
     </UserContext.Provider>
   );

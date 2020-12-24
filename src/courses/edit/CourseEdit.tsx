@@ -13,6 +13,7 @@ import {
   FormCurrency,
   FormItem,
 } from '@erkenningen/ui/components/form';
+import { SelectButton } from '@erkenningen/ui/components/select-button';
 import { Spinner } from '@erkenningen/ui/components/spinner';
 import { Panel } from '@erkenningen/ui/layout/panel';
 import { useGrowlContext } from '@erkenningen/ui/components/growl';
@@ -32,6 +33,7 @@ import {
 const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
   const [showAddLocationDialog, setShowAddLocationDialog] = useState<boolean>(false);
   const [currentForm, setCurrentForm] = useState<FormikProps<any>>();
+  const [locationType, setLocationType] = useState<string>('webinar');
   const { clearGrowl, showGrowl } = useGrowlContext();
   const user = useContext(UserContext);
   const history = useHistory();
@@ -199,6 +201,23 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                 formControlClassName="col-sm-3"
                 keyfilter="(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]"
               />
+
+              <div className="form-group">
+                <label className="control-label col-sm-4 col-md-3 ">Locatie type</label>
+                <div className="col-sm-8 col-md-9 ">
+                  <SelectButton
+                    value={locationType}
+                    options={[
+                      { label: 'Webinar', value: 'webinar' },
+                      { label: 'Online cursus', value: 'online' },
+                      { label: 'Fysieke locatie', value: 'fysiek' },
+                    ]}
+                    className={'p-button-light'}
+                    onChange={(e) => setLocationType(e.value)}
+                  />
+                </div>
+              </div>
+
               <FormSelectGql
                 name={'LokatieID'}
                 label={'Locatie *'}

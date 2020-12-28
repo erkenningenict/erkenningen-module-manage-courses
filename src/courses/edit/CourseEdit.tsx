@@ -33,7 +33,6 @@ import {
 const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
   const [showAddLocationDialog, setShowAddLocationDialog] = useState<boolean>(false);
   const [currentForm, setCurrentForm] = useState<FormikProps<any>>();
-  const [locationType, setLocationType] = useState<string>('webinar');
   const { clearGrowl, showGrowl } = useGrowlContext();
   const user = useContext(UserContext);
   const history = useHistory();
@@ -93,7 +92,7 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
     <>
       <Form
         schema={{
-          LokatieID: [null, yup.number().required()],
+          LokatieID: [20, yup.number().required()],
           Titel: [specialty.Specialty.Titel, yup.string().max(255).required()],
           Promotietekst: [specialty.Specialty.Promotietekst, yup.string().max(5000).required()],
           Prijs: [specialty.Specialty.Kosten, yup.number().required()],
@@ -206,46 +205,54 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                 <label className="control-label col-sm-4 col-md-3 ">Locatie type</label>
                 <div className="col-sm-8 col-md-9 ">
                   <SelectButton
-                    value={locationType}
+                    value={
+                      [10, 20].includes(formikProps.values.LokatieID)
+                        ? formikProps.values.LokatieID
+                        : null
+                    }
                     options={[
-                      { label: 'Webinar', value: 'webinar' },
-                      { label: 'Online cursus', value: 'online' },
-                      { label: 'Fysieke locatie', value: 'fysiek' },
+                      { label: 'Webinar', value: 20 },
+                      { label: 'Online cursus', value: 10 },
+                      { label: 'Fysieke locatie', value: null },
                     ]}
                     className={'p-button-light'}
-                    onChange={(e) => setLocationType(e.value)}
+                    onChange={(e) => formikProps.setFieldValue('LokatieID', e.value)}
                   />
                 </div>
               </div>
 
-              <FormSelectGql
-                name={'LokatieID'}
-                label={'Locatie *'}
-                placeholder={'Selecteer een locatie'}
-                formControlClassName="col-sm-5"
-                filter={true}
-                mapResult={(data: SearchLocationsQuery) => {
-                  return (
-                    data.SearchLocations?.map((location) => ({
-                      label: `${location.Naam}${
-                        location.Contactgegevens?.Woonplaats
-                          ? ' | ' + location.Contactgegevens?.Woonplaats
-                          : ''
-                      }`,
-                      value: location.LokatieID,
-                    })) || []
-                  );
-                }}
-                gqlQuery={SearchLocationsDocument}
-                variables={{ VakgroepID: specialty.Specialty?.VakgroepID }}
-              >
-                <Button
-                  className="mr-2"
-                  label="Nieuwe locatie aanmaken"
-                  type="link"
-                  onClick={() => onNewLocationClick(formikProps)}
-                />
-              </FormSelectGql>
+              {![10, 20].includes(formikProps.values.LokatieID) ? (
+                <FormSelectGql
+                  name={'LokatieID'}
+                  label={'Locatie *'}
+                  placeholder={'Selecteer een locatie'}
+                  formControlClassName="col-sm-5"
+                  filter={true}
+                  mapResult={(data: SearchLocationsQuery) => {
+                    return (
+                      data.SearchLocations?.filter(
+                        (location) => ![10, 20].includes(location.LokatieID),
+                      ).map((location) => ({
+                        label: `${location.Naam}${
+                          location.Contactgegevens?.Woonplaats
+                            ? ' | ' + location.Contactgegevens?.Woonplaats
+                            : ''
+                        }`,
+                        value: location.LokatieID,
+                      })) || []
+                    );
+                  }}
+                  gqlQuery={SearchLocationsDocument}
+                  variables={{ VakgroepID: specialty.Specialty?.VakgroepID }}
+                >
+                  <Button
+                    className="mr-2"
+                    label="Nieuwe locatie aanmaken"
+                    type="link"
+                    onClick={() => onNewLocationClick(formikProps)}
+                  />
+                </FormSelectGql>
+              ) : null}
               <FormText
                 name={'Docent'}
                 label={'Docent(en)'}

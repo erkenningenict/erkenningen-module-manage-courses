@@ -53,6 +53,7 @@ query Specialty($vakId: Int!) {
     Code
     Titel
     Promotietekst
+    DigitaalAanbod
     Kosten
     MinimumDatum
     MaximumDatum

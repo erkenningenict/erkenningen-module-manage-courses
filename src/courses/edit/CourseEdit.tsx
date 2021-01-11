@@ -12,6 +12,7 @@ import {
   FormCheckbox,
   FormCurrency,
   FormItem,
+  FormStaticItem,
 } from '@erkenningen/ui/components/form';
 import { SelectButton } from '@erkenningen/ui/components/select-button';
 import { Spinner } from '@erkenningen/ui/components/spinner';
@@ -92,7 +93,7 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
     <>
       <Form
         schema={{
-          LokatieID: [20, yup.number().required()],
+          LokatieID: [specialty.Specialty.DigitaalAanbod ? 10 : 20, yup.number().required()],
           Titel: [specialty.Specialty.Titel, yup.string().max(255).required()],
           Promotietekst: [specialty.Specialty.Promotietekst, yup.string().max(5000).required()],
           Prijs: [specialty.Specialty.Kosten, yup.number().required()],
@@ -201,27 +202,28 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                 keyfilter="(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]"
               />
 
-              <div className="form-group">
-                <label className="control-label col-sm-4 col-md-3 ">Locatie type</label>
-                <div className="col-sm-8 col-md-9 ">
-                  <SelectButton
-                    value={
-                      [10, 20].includes(formikProps.values.LokatieID)
-                        ? formikProps.values.LokatieID
-                        : null
-                    }
-                    options={[
-                      { label: 'Webinar', value: 20 },
-                      { label: 'Online cursus', value: 10 },
-                      { label: 'Fysieke locatie', value: null },
-                    ]}
-                    className={'p-button-light'}
-                    onChange={(e) => formikProps.setFieldValue('LokatieID', e.value)}
-                  />
+              {formikProps.values.LokatieID === 10 ? (
+                <FormStaticItem label={'Uitvoeringstype'}>Online cursus</FormStaticItem>
+              ) : (
+                <div className="form-group">
+                  <label className="control-label col-sm-4 col-md-3 ">Uitvoeringstype</label>
+                  <div className="col-sm-8 col-md-9 ">
+                    <SelectButton
+                      value={
+                        formikProps.values.LokatieID === 20 ? formikProps.values.LokatieID : null
+                      }
+                      options={[
+                        { label: 'Webinar', value: 20 },
+                        { label: 'Fysieke locatie', value: null },
+                      ]}
+                      className={'p-button-light'}
+                      onChange={(e) => formikProps.setFieldValue('LokatieID', e.value)}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {![10, 20].includes(formikProps.values.LokatieID) ? (
+              {formikProps.values.LokatieID !== 20 ? (
                 <FormSelectGql
                   name={'LokatieID'}
                   label={'Locatie *'}

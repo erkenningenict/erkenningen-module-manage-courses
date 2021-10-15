@@ -2,17 +2,20 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { HashRouter } from 'react-router-dom';
-import { ApolloClient, ApolloProvider, HttpLink, InMemoryCache } from '@apollo/client';
+import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
+import { createUploadLink } from 'apollo-upload-client';
 
 import { ERKENNINGEN_GRAPHQL_API_URL } from '@erkenningen/config';
 
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
+import './index.scss';
+
 const cache = new InMemoryCache();
 
 const client = new ApolloClient({
-  link: new HttpLink({
+  link: createUploadLink({
     uri: ERKENNINGEN_GRAPHQL_API_URL,
     credentials: 'include',
   }),

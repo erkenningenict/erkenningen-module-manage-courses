@@ -73,3 +73,200 @@ mutation saveLocation($input: saveLocationInput!) {
     Naam
   }
 }
+
+## COPIED
+
+query ListKnowledgeMeetings($input: listKnowledgeMeetingsInput!) {
+  ListKnowledgeMeetings(input: $input) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+    }
+    nodes {
+      CursusID
+      VakID
+      Titel
+      CursusCode
+      IsBesloten
+      Status
+      Sessies {
+        SessieID
+        Datum
+        Lokatie {
+          LokatieID
+          Naam
+          Contactgegevens {
+            ContactgegevensID
+            Woonplaats
+          }
+        }
+      }
+      CursusDeelnames {
+        Status
+      }
+      AantalCursusDeelnames
+    }
+  }
+}
+
+query KnowledgeMeetingDetails($input: knowledgeMeetingDetailsInput!) {
+  KnowledgeMeetingDetails(input: $input) {
+    Cursus {
+      CursusID
+      VakID
+      CursusleiderID
+      Prijs
+      Titel
+      Promotietekst
+      MaximumCursisten
+      Opmerkingen
+      Status
+      CursusCode
+      DatumAangemaakt
+      DatumGewijzigd
+      PersoonIDAangemaakt
+      PersoonIDGewijzigd
+      AantalDeelnamesVoorlopig
+      AantalDeelnamesAangemeld
+      Vak {
+        VakID
+        MinimumDatum
+        MaximumDatum
+        Titel
+        Afkorting
+        VakgroepID
+        Vakgroep {
+          Naam
+          Contactgegevens {
+            Adresregel1
+            Huisnummer
+            HuisnummerToevoeging
+            Woonplaats
+            Telefoon
+            Email
+            TerAttentieVan
+          }
+        }
+        Themas {
+          Naam
+        }
+      }
+      Sessies {
+        SessieID
+        Datum
+        Begintijd
+        DatumBegintijd
+        Eindtijd
+        DatumEindtijd
+        Opmerkingen
+        Docent
+        SessieType
+        Lokatie {
+          LokatieID
+          Naam
+          Contactgegevens {
+            ContactgegevensID
+            Woonplaats
+          }
+        }
+      }
+      CursusDeelnames {
+        CursusDeelnameID
+        Status
+        Persoon {
+          PersoonID
+          Geboortedatum
+          SortableFullName
+          Contactgegevens {
+            Adresregel1
+            Postcode
+            Woonplaats
+            Telefoon
+            Email
+          }
+        }
+      }
+    }
+  }
+}
+
+query GetInvoices(
+  $pageSize: Int!
+  $pageNumber: Int!
+  $sortField: String!
+  $sortDirection: SortDirectionEnum!
+  $filterInvoices: FilterInvoicesInput
+) {
+  invoices(
+    pageSize: $pageSize
+    pageNumber: $pageNumber
+    orderBy: { field: $sortField, sortDirection: $sortDirection }
+    filterInvoices: $filterInvoices
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+    }
+    nodes {
+      FactuurID
+      FactuurNummer
+      KenmerkJaarFactuurNummer
+      FactuurStatus
+      StatusOpmerkingen
+      FactuurJaar
+      IsBetaald
+      FactuurDatum
+      BedragExBtw
+      BedragIncBtw
+      BtwBedrag
+      ProductCode
+      ProductNaam
+      InvoiceLink
+      Kenmerk
+    }
+  }
+}
+
+mutation saveKnowledgeMeeting($input: SaveKnowledgeMeetingInput!) {
+  saveKnowledgeMeeting(input: $input) {
+    Cursus {
+      CursusID
+    }
+  }
+}
+
+mutation saveLocation($input: saveLocationInput!) {
+  saveLocation(input: $input) {
+    LokatieID
+    Naam
+  }
+}
+
+mutation deleteKnowledgeMeeting($input: DeleteKnowledgeMeetingInput!) {
+  deleteKnowledgeMeeting(input: $input) {
+    success
+  }
+}
+
+mutation uploadKnowledgeMeetingParticipantsExcel(
+  $input: UploadKnowledgeMeetingParticipantsExcelInput!
+) {
+  uploadKnowledgeMeetingParticipantsExcel(input: $input) {
+    success
+    validationErrors
+  }
+}
+
+mutation removeKnowledgeMeetingParticipant($input: RemoveKnowledgeMeetingParticipantInput!) {
+  removeKnowledgeMeetingParticipant(input: $input) {
+    success
+  }
+}
+
+mutation submitKnowledgeMeetingParticipants($input: SubmitKnowledgeMeetingParticipantsInput!) {
+  submitKnowledgeMeetingParticipants(input: $input) {
+    success
+  }
+}

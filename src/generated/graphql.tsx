@@ -65,6 +65,7 @@ export type Certificering = {
   Certificaat?: Maybe<Certificaat>;
   CertificeringAantekeningen?: Maybe<Array<Maybe<CertificeringAantekening>>>;
   Passen?: Maybe<Array<Maybe<Pas>>>;
+  Persoon?: Maybe<Persoon>;
 };
 
 export type CertificeringAantekening = {
@@ -133,14 +134,10 @@ export type Cursus = {
   CursusDeelnames?: Maybe<Array<Maybe<CursusDeelname>>>;
   /**  Only available when sub query is available  */
   AantalCursusDeelnames?: Maybe<Scalars['Int']>;
+  /**  Only available when associated entity CursusDeelname is available  */
+  AantalDeelnamesVoorlopig?: Maybe<Scalars['Int']>;
+  AantalDeelnamesAangemeld?: Maybe<Scalars['Int']>;
 };
-
-export enum CursusStatusEnum {
-  Voorlopig = 'Voorlopig',
-  Goedgekeurd = 'Goedgekeurd',
-  Betaald = 'Betaald',
-  ExamenAangemeld = 'ExamenAangemeld'
-}
 
 export type CursusDeelname = {
   __typename?: 'CursusDeelname';
@@ -162,6 +159,19 @@ export type DigitaalExamen = {
   ExamenType: Scalars['String'];
   AssementId: Scalars['String'];
   ExamenNaam: Scalars['String'];
+};
+
+export type DiscussieVisitatie = {
+  __typename?: 'DiscussieVisitatie';
+  DiscussieVisitatieID: Scalars['Int'];
+  VisitatieID: Scalars['Int'];
+  PersoonID?: Maybe<Scalars['Int']>;
+  VakgroepID?: Maybe<Scalars['Int']>;
+  Commentaar?: Maybe<Scalars['String']>;
+  DatumTijd?: Maybe<Scalars['Date']>;
+  IsAuteurVakgroep?: Maybe<Scalars['Boolean']>;
+  IsAuteurInspecteur?: Maybe<Scalars['Boolean']>;
+  Persoon?: Maybe<Persoon>;
 };
 
 export type ExamenInstelling = {
@@ -204,6 +214,18 @@ export type Lokatie = {
   Contactgegevens: Contactgegevens;
 };
 
+export type Monitor = {
+  __typename?: 'Monitor';
+  MonitorID: Scalars['Int'];
+  ExamenInstellingID: Scalars['Int'];
+  Voornaam: Scalars['SafeString'];
+  Tussenvoegsel?: Maybe<Scalars['SafeString']>;
+  Achternaam: Scalars['SafeString'];
+  Geslacht: Scalars['SafeString'];
+  Email: Scalars['Email'];
+  SortableFullName?: Maybe<Scalars['SafeString']>;
+};
+
 export type NormVersie = {
   __typename?: 'NormVersie';
   NormVersieID: Scalars['Int'];
@@ -227,6 +249,8 @@ export type Pas = {
   ContactgegevensID?: Maybe<Scalars['Int']>;
   Geadresseerde?: Maybe<Scalars['String']>;
   PasRetouren?: Maybe<Array<Maybe<PasRetour>>>;
+  Licentie?: Maybe<Certificering>;
+  PasAdres?: Maybe<Contactgegevens>;
 };
 
 export type PasRetour = {
@@ -292,6 +316,7 @@ export type Sessie = {
   Visitatie?: Maybe<Visitatie>;
   Cursus?: Maybe<Cursus>;
   DigitaalExamen?: Maybe<DigitaalExamen>;
+  Monitors?: Maybe<Array<Maybe<Monitor>>>;
 };
 
 export type Studieresultaat = {
@@ -352,11 +377,16 @@ export type Vak = {
   IsExamenVak?: Maybe<Scalars['Boolean']>;
   ExamenType?: Maybe<Scalars['String']>;
   Competenties?: Maybe<Array<Maybe<Competentie>>>;
+  CompetentieID?: Maybe<Scalars['Int']>;
+  CompetentieNaam?: Maybe<Scalars['String']>;
   Themas?: Maybe<Array<Maybe<Thema>>>;
+  ThemaID?: Maybe<Scalars['Int']>;
+  ThemaNaam?: Maybe<Scalars['String']>;
   Vakgroep?: Maybe<Vakgroep>;
   Status?: Maybe<Scalars['String']>;
   Website?: Maybe<Scalars['String']>;
   ExamenInstelling?: Maybe<ExamenInstelling>;
+  BeoordelaarNaam?: Maybe<Scalars['String']>;
   Beoordelingen?: Maybe<Array<Maybe<Beoordeling>>>;
   VakVaardigheden?: Maybe<Array<Maybe<Vaardigheid>>>;
   VakKennisgebieden?: Maybe<Array<Maybe<Kennisgebied>>>;
@@ -402,17 +432,72 @@ export type Vaknorm = {
   MinimumPunten: Scalars['Int'];
 };
 
+export type VisitatieBeoordelingCategorieVraag = {
+  __typename?: 'VisitatieBeoordelingCategorieVraag';
+  VisitatieBeoordelingCategorieVraagID: Scalars['ID'];
+  VisitatieBeoordelingCategorieID: Scalars['ID'];
+  CategorieTemplateID: Scalars['Int'];
+  VraagTemplateID: Scalars['Int'];
+  Naam: Scalars['String'];
+  Weging: Scalars['Float'];
+  TotaalPunten?: Maybe<Scalars['Float']>;
+  Cijfer?: Maybe<Scalars['Float']>;
+  Toelichting?: Maybe<Scalars['String']>;
+  Versie: Scalars['String'];
+  VanafDatum: Scalars['Date'];
+  DatumAangemaakt: Scalars['Date'];
+  AangemaaktDoor?: Maybe<Scalars['String']>;
+  DatumGewijzigd: Scalars['Date'];
+  GewijzigdDoor?: Maybe<Scalars['String']>;
+};
+
+export type VisitatieBeoordelingCategorie = {
+  __typename?: 'VisitatieBeoordelingCategorie';
+  VisitatieBeoordelingCategorieID: Scalars['ID'];
+  VisitatieID: Scalars['Int'];
+  CategorieTemplateID: Scalars['Int'];
+  CategorieNaam: Scalars['String'];
+  Weging: Scalars['Float'];
+  TotaalPunten?: Maybe<Scalars['Float']>;
+  Cijfer?: Maybe<Scalars['Float']>;
+  Versie: Scalars['String'];
+  VanafDatum: Scalars['Date'];
+  DatumAangemaakt: Scalars['Date'];
+  AangemaaktDoor?: Maybe<Scalars['String']>;
+  DatumGewijzigd: Scalars['Date'];
+  GewijzigdDoor?: Maybe<Scalars['String']>;
+  Vragen?: Maybe<Array<Maybe<VisitatieBeoordelingCategorieVraag>>>;
+};
+
 export type Visitatie = {
   __typename?: 'Visitatie';
   VisitatieID: Scalars['Int'];
   SessieID: Scalars['Int'];
   PersoonID: Scalars['Int'];
   Rapport?: Maybe<Scalars['String']>;
-  RapportCijfer: Scalars['Int'];
-  Status: Scalars['String'];
+  VragenJson?: Maybe<Scalars['SafeString']>;
+  Rapportcijfer?: Maybe<Scalars['Int']>;
+  Status: VisitatieStatusEnum;
   DatumVisitatie?: Maybe<Scalars['Date']>;
   DatumRapport?: Maybe<Scalars['Date']>;
   VolgensIntentieAanbod: Scalars['Boolean'];
+  Sessie?: Maybe<Sessie>;
+  Cursus?: Maybe<Cursus>;
+  DiscussieVisitaties?: Maybe<Array<Maybe<DiscussieVisitatie>>>;
+  Inspecteur?: Maybe<Persoon>;
+  DatumAangemaakt?: Maybe<Scalars['Date']>;
+  AangemaaktDoor?: Maybe<Scalars['String']>;
+  DatumGewijzigd?: Maybe<Scalars['Date']>;
+  GewijzigdDoor?: Maybe<Scalars['String']>;
+  /** Only available when sub-query is available */
+  IsDeclarationPossible?: Maybe<Scalars['Boolean']>;
+  /** Only available when sub-query is available */
+  IsDeclarationSubmitted?: Maybe<Scalars['Boolean']>;
+  /** Only available when sub-query is available */
+  LastChangeDate?: Maybe<Scalars['Date']>;
+  /** Only available when sub-query is available */
+  LastChangeBy?: Maybe<Scalars['String']>;
+  VisitatieBeoordelingCategorieen?: Maybe<Array<Maybe<VisitatieBeoordelingCategorie>>>;
 };
 
 export type VooropleidingCategorie = {
@@ -432,6 +517,78 @@ export type Vooropleiding = {
   Categorie: VooropleidingCategorie;
   IsActief: Scalars['Boolean'];
   Certificaten?: Maybe<Array<Maybe<Certificaat>>>;
+};
+
+export enum CursusStatusEnum {
+  Voorlopig = 'Voorlopig',
+  Goedgekeurd = 'Goedgekeurd',
+  Betaald = 'Betaald'
+}
+
+export enum VisitatieStatusEnum {
+  Ingepland = 'Ingepland',
+  RapportWordtOpgesteld = 'RapportWordtOpgesteld',
+  Ingediend = 'Ingediend'
+}
+
+export enum DebiteurTypeEnum {
+  Vakgroep = 'vakgroep',
+  Universiteit = 'universiteit',
+  Persoon = 'persoon',
+  Exameninstelling = 'exameninstelling'
+}
+
+export enum SortDirectionEnum {
+  Asc = 'ASC',
+  Desc = 'DESC'
+}
+
+export enum ProductEnum {
+  D1 = 'D1',
+  D2 = 'D2',
+  D3 = 'D3',
+  D4 = 'D4'
+}
+
+export enum CursusDeelnameStatusEnum {
+  Aangemeld = 'Aangemeld',
+  Aanwezig = 'Aanwezig',
+  Voorlopig = 'Voorlopig',
+  Betaald = 'Betaald',
+  Afgemeld = 'Afgemeld',
+  Geregistreerd = 'Geregistreerd',
+  Afgewezen = 'Afgewezen',
+  Geslaagd = 'Geslaagd',
+  Gezakt = 'Gezakt',
+  /** Geslaagd theorie, gezakt praktijk" */
+  GeslaagdTheorieGezaktPraktijk = 'GeslaagdTheorie_GezaktPraktijk',
+  /** Gezakt theorie, geslaagd praktijk" */
+  GeslaagdPraktijkGezaktTheorie = 'GeslaagdPraktijk_GezaktTheorie'
+}
+
+export enum PasStatusEnum {
+  Aangevraagd = 'Aangevraagd',
+  Uitgeleverd = 'Uitgeleverd',
+  Betaald = 'Betaald',
+  OnHold = 'OnHold'
+}
+
+export enum VakExamenTypeEnum {
+  StartExamen = 'START_EXAMEN',
+  HercertificeringsExamen = 'HERCERTIFICERINGS_EXAMEN'
+}
+
+export type PageInfo = {
+  __typename?: 'PageInfo';
+  hasNextPage?: Maybe<Scalars['Boolean']>;
+  hasPreviousPage?: Maybe<Scalars['Boolean']>;
+};
+
+export type OrderByArgs = {
+  /** The field to order by */
+  field: Scalars['String'];
+  /** The sort direction */
+  sortDirection: SortDirectionEnum;
 };
 
 export type RequestAdviseCertificateInput = {
@@ -498,6 +655,8 @@ export type Mutation = {
    * are not required to have the personInput entered.
    */
   requestAdviseCertificate?: Maybe<ExemptionRequestResult>;
+  registerCardReturn: Scalars['Boolean'];
+  createDuplicateCardWithoutInvoice: Scalars['Boolean'];
   /** Register for course */
   registerForCourse: RegisterResult;
   /** Un-register for course. Input is CursusDeelnameID */
@@ -507,13 +666,25 @@ export type Mutation = {
   decoupleLicense: DecoupleLicenseResult;
   /** The `requestDuplicate` can be used to request a license card duplicate */
   requestDuplicate: RequestDuplicateResult;
-  saveExam?: Maybe<Cursus>;
-  deleteExam?: Maybe<Scalars['Boolean']>;
+  saveExam?: Maybe<SaveExamResult>;
+  deleteExam?: Maybe<DeleteExamResult>;
+  uploadParticipantsExcel?: Maybe<UploadParticipantsExcelResult>;
+  removeParticipant?: Maybe<RemoveParticipantResult>;
+  submitParticipants?: Maybe<SubmitParticipantsResult>;
   updatePlanning: UpdatePlanningResult;
   updateInvoiceStatus: UpdateInvoiceStatusResult;
   createInvoiceCollection: CreateInvoiceCollectionResult;
+  saveKnowledgeMeeting?: Maybe<SaveKnowledgeMeetingResult>;
+  deleteKnowledgeMeeting?: Maybe<DeleteKnowledgeMeetingResult>;
+  uploadKnowledgeMeetingParticipantsExcel?: Maybe<UploadKnowledgeMeetingParticipantsExcelResult>;
+  removeKnowledgeMeetingParticipant?: Maybe<RemoveKnowledgeMeetingParticipantResult>;
+  submitKnowledgeMeetingParticipants?: Maybe<SubmitKnowledgeMeetingParticipantsResult>;
   /** Create or update a location */
   saveLocation: Lokatie;
+  /** Create or update a monitor */
+  saveMonitor: Monitor;
+  assignMonitor?: Maybe<Scalars['Boolean']>;
+  unassignMonitor?: Maybe<Scalars['Boolean']>;
   /**
    * Checks if person exists in the database by bsn and birth date and if not,
    * checks the person in the GBA
@@ -521,6 +692,8 @@ export type Mutation = {
   checkForExistingPersonByBsn?: Maybe<CheckForExistingPersonByBsnResult>;
   /** Checks if the person exists by initials, last name and birth date in the database */
   checkForExistingPersonByPersonData?: Maybe<CheckForExistingPersonByPersonDataResult>;
+  /** Manually start processing of graduates */
+  manuallyProcessGraduates: ManuallyProcessGraduatesResult;
   /** The `requestLicense` can be used to request a certificate */
   requestLicense: RequestLicenseResult;
   /** The createLicense mutation is used to create a new license and a card for a person */
@@ -528,12 +701,25 @@ export type Mutation = {
   singleUpload: File;
   multipleUpload: Array<File>;
   multiUpload: MultiUploadResult;
+  addVisitationComment?: Maybe<DiscussieVisitatie>;
+  updateVisitationReport: Visitatie;
+  createDeclarationInvoice: DeclarationInvoiceCreatedResult;
 };
 
 
 export type MutationRequestAdviseCertificateArgs = {
   input: RequestAdviseCertificateInput;
   personDataInput?: Maybe<RequestAdviseCertificatePersonDataInput>;
+};
+
+
+export type MutationRegisterCardReturnArgs = {
+  input: RegisterCardReturnInput;
+};
+
+
+export type MutationCreateDuplicateCardWithoutInvoiceArgs = {
+  pasId: Scalars['Int'];
 };
 
 
@@ -572,6 +758,21 @@ export type MutationDeleteExamArgs = {
 };
 
 
+export type MutationUploadParticipantsExcelArgs = {
+  input: UploadParticipantsExcelInput;
+};
+
+
+export type MutationRemoveParticipantArgs = {
+  input: RemoveParticipantInput;
+};
+
+
+export type MutationSubmitParticipantsArgs = {
+  input: SubmitParticipantsInput;
+};
+
+
 export type MutationUpdatePlanningArgs = {
   sessieId: Scalars['Int'];
   inspectorId: Scalars['Int'];
@@ -589,8 +790,48 @@ export type MutationCreateInvoiceCollectionArgs = {
 };
 
 
+export type MutationSaveKnowledgeMeetingArgs = {
+  input: SaveKnowledgeMeetingInput;
+};
+
+
+export type MutationDeleteKnowledgeMeetingArgs = {
+  input: DeleteKnowledgeMeetingInput;
+};
+
+
+export type MutationUploadKnowledgeMeetingParticipantsExcelArgs = {
+  input: UploadKnowledgeMeetingParticipantsExcelInput;
+};
+
+
+export type MutationRemoveKnowledgeMeetingParticipantArgs = {
+  input: RemoveKnowledgeMeetingParticipantInput;
+};
+
+
+export type MutationSubmitKnowledgeMeetingParticipantsArgs = {
+  input: SubmitKnowledgeMeetingParticipantsInput;
+};
+
+
 export type MutationSaveLocationArgs = {
   input: SaveLocationInput;
+};
+
+
+export type MutationSaveMonitorArgs = {
+  input: SaveMonitorInput;
+};
+
+
+export type MutationAssignMonitorArgs = {
+  input: AssignMonitorInput;
+};
+
+
+export type MutationUnassignMonitorArgs = {
+  input: UnassignMonitorInput;
 };
 
 
@@ -635,6 +876,21 @@ export type MutationMultiUploadArgs = {
   file2: Scalars['Upload'];
 };
 
+
+export type MutationAddVisitationCommentArgs = {
+  input: AddVisitationCommentInput;
+};
+
+
+export type MutationUpdateVisitationReportArgs = {
+  input: UpdateVisitationReportInput;
+};
+
+
+export type MutationCreateDeclarationInvoiceArgs = {
+  input: CreateDeclarationInvoiceInput;
+};
+
 export type ExemptionRequestResult = {
   __typename?: 'exemptionRequestResult';
   VrijstellingsVerzoekID: Scalars['Int'];
@@ -644,6 +900,7 @@ export type ExemptionRequestResult = {
 
 export type Query = {
   __typename?: 'Query';
+  searchCard?: Maybe<Certificering>;
   Certificaten?: Maybe<Array<Maybe<Certificaat>>>;
   Certificeringen?: Maybe<Array<Maybe<Certificering>>>;
   Competenties: Array<Maybe<Competentie>>;
@@ -651,19 +908,24 @@ export type Query = {
   /** In the input, either specialtyId or courseId must be supplied */
   isLicenseValidForSpecialty: IsLicenseValidForSpecialtyResult;
   CursusSessies?: Maybe<Array<Maybe<CursusSessie>>>;
+  hasDuplicatePending: Scalars['Boolean'];
   ExamenInstellingen: Array<Maybe<ExamenInstelling>>;
   ExamDetails?: Maybe<Exam>;
   Exams?: Maybe<CursusNodes>;
   getInspectionPlanning?: Maybe<InspectionResult>;
   getInspectors?: Maybe<Array<Maybe<Inspector>>>;
+  getInspectionReports?: Maybe<Array<Maybe<Visitatie>>>;
   /**
    * Get unpaid invoices.
    * Optionally filter by status. And apply pagination with pageSize, pageNumber and orderBy (default: createdOn, DESC)
    */
   invoices: FactuurNodes;
+  KnowledgeMeetingDetails?: Maybe<Exam>;
+  ListKnowledgeMeetings?: Maybe<CursusNodes>;
   Kennisgebieden: Array<Maybe<Kennisgebied>>;
   Landen: Array<Maybe<Landen>>;
   SearchLocations?: Maybe<Array<Maybe<Lokatie>>>;
+  SearchMonitors?: Maybe<Array<Maybe<Monitor>>>;
   /** Fetches data of the current logged in person */
   my?: Maybe<My>;
   Nationaliteiten: Array<Maybe<Nationaliteiten>>;
@@ -682,6 +944,9 @@ export type Query = {
   Themas: Array<Maybe<Thema>>;
   uploads?: Maybe<Array<Maybe<File>>>;
   Vakgroepen: Array<Maybe<Vakgroep>>;
+  Visitations?: Maybe<VisitationInfoNodes>;
+  Visitation?: Maybe<Visitatie>;
+  VisitationDeclaration?: Maybe<VisitationDeclaration>;
   /**
    * Gets a list of all available pre educations (vooropleidingen)
    * Optionally pass a array of codes (similar in vooropleiding.code) to filter the list (i.e. ["30.00", "30.01"])
@@ -691,6 +956,11 @@ export type Query = {
   preEducationCategories: Array<Maybe<VooropleidingCategorie>>;
   /** Gets an array of Certificate's by the code of the pre-education (vooropleiding) */
   certificatesByPreEducation: Array<Maybe<Certificaat>>;
+};
+
+
+export type QuerySearchCardArgs = {
+  licenseNumber: Scalars['SafeString'];
 };
 
 
@@ -719,6 +989,11 @@ export type QueryCursusSessiesArgs = {
 };
 
 
+export type QueryHasDuplicatePendingArgs = {
+  licenseId: Scalars['Int'];
+};
+
+
 export type QueryExamenInstellingenArgs = {
   isActive?: Maybe<Scalars['Boolean']>;
   findById?: Maybe<Scalars['Int']>;
@@ -740,6 +1015,11 @@ export type QueryGetInspectionPlanningArgs = {
 };
 
 
+export type QueryGetInspectionReportsArgs = {
+  input: GetInspectionReportsInput;
+};
+
+
 export type QueryInvoicesArgs = {
   pageSize: Scalars['Int'];
   pageNumber: Scalars['Int'];
@@ -748,8 +1028,23 @@ export type QueryInvoicesArgs = {
 };
 
 
+export type QueryKnowledgeMeetingDetailsArgs = {
+  input: KnowledgeMeetingDetailsInput;
+};
+
+
+export type QueryListKnowledgeMeetingsArgs = {
+  input: ListKnowledgeMeetingsInput;
+};
+
+
 export type QuerySearchLocationsArgs = {
   input: SearchLocationsInput;
+};
+
+
+export type QuerySearchMonitorsArgs = {
+  input: SearchMonitorsInput;
 };
 
 
@@ -806,6 +1101,21 @@ export type QueryVakgroepenArgs = {
 };
 
 
+export type QueryVisitationsArgs = {
+  input: VisitationsInput;
+};
+
+
+export type QueryVisitationArgs = {
+  input: VisitationInput;
+};
+
+
+export type QueryVisitationDeclarationArgs = {
+  input: VisitationInput;
+};
+
+
 export type QueryVooropleidingenArgs = {
   codes?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
@@ -813,6 +1123,11 @@ export type QueryVooropleidingenArgs = {
 
 export type QueryCertificatesByPreEducationArgs = {
   code: Scalars['String'];
+};
+
+export type RegisterCardReturnInput = {
+  PasID: Scalars['Int'];
+  DatumRetour: Scalars['Date'];
 };
 
 export type RegisterForCourseInput = {
@@ -882,6 +1197,7 @@ export type CursusSessie = {
   Registered: Scalars['Boolean'];
   RegisteredDate?: Maybe<Scalars['Date']>;
   CanUnRegister: Scalars['Boolean'];
+  SpecialtyWebsite?: Maybe<Scalars['String']>;
 };
 
 export type LocationAddress = {
@@ -934,7 +1250,7 @@ export type CreateCourseInput = {
 export type DecoupleLicenseInput = {
   /** Current XX + KBA license which should be decoupled */
   licenseId: Scalars['Int'];
-  confirmationEmail?: Maybe<Scalars['Email']>;
+  confirmationEmail?: Maybe<Scalars['String']>;
 };
 
 export type DecoupleLicenseResult = {
@@ -980,9 +1296,20 @@ export type ExamsInput = {
   to?: Maybe<Scalars['Date']>;
   /** Filter on LocatieID */
   locationId?: Maybe<Scalars['Int']>;
+  /** Show without participants only */
+  withoutParticipants?: Maybe<Scalars['Boolean']>;
   pageSize: Scalars['Int'];
   pageNumber: Scalars['Int'];
   orderBy: OrderByArgs;
+};
+
+export type UploadParticipantsExcelInput = {
+  CursusID?: Maybe<Scalars['Int']>;
+  file: Scalars['Upload'];
+};
+
+export type SubmitParticipantsInput = {
+  CursusID?: Maybe<Scalars['Int']>;
 };
 
 export type SaveExamInput = {
@@ -1006,6 +1333,37 @@ export type DeleteExamInput = {
   CursusID?: Maybe<Scalars['Int']>;
 };
 
+export type SaveExamResult = {
+  __typename?: 'SaveExamResult';
+  Cursus: Cursus;
+};
+
+export type DeleteExamResult = {
+  __typename?: 'DeleteExamResult';
+  success: Scalars['Boolean'];
+};
+
+export type UploadParticipantsExcelResult = {
+  __typename?: 'UploadParticipantsExcelResult';
+  success: Scalars['Boolean'];
+  validationErrors?: Maybe<Array<Maybe<Scalars['String']>>>;
+};
+
+export type SubmitParticipantsResult = {
+  __typename?: 'SubmitParticipantsResult';
+  success: Scalars['Boolean'];
+};
+
+export type RemoveParticipantResult = {
+  __typename?: 'RemoveParticipantResult';
+  success: Scalars['Boolean'];
+};
+
+export type RemoveParticipantInput = {
+  CursusID?: Maybe<Scalars['Int']>;
+  CursusDeelnameID?: Maybe<Scalars['Int']>;
+};
+
 export type Exam = {
   __typename?: 'Exam';
   Cursus?: Maybe<Cursus>;
@@ -1017,6 +1375,19 @@ export type CursusNodes = {
   totalCount: Scalars['Int'];
   nodes?: Maybe<Array<Maybe<Cursus>>>;
   pageInfo?: Maybe<PageInfo>;
+};
+
+export type GetInspectionReportsInput = {
+  datumVisitatieVan: Scalars['Date'];
+  datumVisitatieTot: Scalars['Date'];
+  inspecteurId: Scalars['Int'];
+  rapportCijfer: Scalars['Int'];
+  competentieId: Scalars['Int'];
+  themaId: Scalars['Int'];
+  vakgroepId: Scalars['Int'];
+  vakId: Scalars['Int'];
+  volgensIntentieAanbod: Scalars['Int'];
+  examenInstellingId: Scalars['Int'];
 };
 
 export type UpdatePlanningResult = {
@@ -1186,20 +1557,6 @@ export enum PaymentStatusEnum {
   Paid = 'PAID'
 }
 
-export enum DebiteurTypeEnum {
-  Vakgroep = 'vakgroep',
-  Universiteit = 'universiteit',
-  Persoon = 'persoon',
-  Exameninstelling = 'exameninstelling'
-}
-
-export type OrderByArgs = {
-  /** The field to order by */
-  field: Scalars['String'];
-  /** The sort direction */
-  sortDirection: SortDirectionEnum;
-};
-
 export type FactuurNodes = {
   __typename?: 'FactuurNodes';
   /** Total nr of emails */
@@ -1251,17 +1608,6 @@ export type Invoice = {
   CreditInvoiceLink?: Maybe<Scalars['String']>;
 };
 
-export type PageInfo = {
-  __typename?: 'PageInfo';
-  hasNextPage?: Maybe<Scalars['Boolean']>;
-  hasPreviousPage?: Maybe<Scalars['Boolean']>;
-};
-
-export enum SortDirectionEnum {
-  Asc = 'ASC',
-  Desc = 'DESC'
-}
-
 export enum FactuurHistorieStatusEnum {
   Aangemaakt = 'Aangemaakt',
   Betaald = 'Betaald',
@@ -1270,6 +1616,102 @@ export enum FactuurHistorieStatusEnum {
   Oninbaar = 'Oninbaar',
   Creditfactuur = 'Creditfactuur'
 }
+
+export enum InkoopVerkoopEnum {
+  Inkoop = 'INKOOP',
+  Verkoop = 'VERKOOP'
+}
+
+export type KnowledgeMeetingDetailsInput = {
+  CursusID: Scalars['Int'];
+};
+
+export type ListKnowledgeMeetingsInput = {
+  /** Filter on part of course code */
+  courseCode?: Maybe<Scalars['SafeString']>;
+  /** Filter on part of title */
+  title?: Maybe<Scalars['SafeString']>;
+  /** Filter on status */
+  status?: Maybe<CursusStatusEnum>;
+  /** Date range, from */
+  from?: Maybe<Scalars['Date']>;
+  /** Date range, to */
+  to?: Maybe<Scalars['Date']>;
+  /** Filter on LocatieID */
+  locationId?: Maybe<Scalars['Int']>;
+  /** Show without participants only */
+  withoutParticipants?: Maybe<Scalars['Boolean']>;
+  pageSize: Scalars['Int'];
+  pageNumber: Scalars['Int'];
+  orderBy: OrderByArgs;
+};
+
+export type UploadKnowledgeMeetingParticipantsExcelInput = {
+  CursusID?: Maybe<Scalars['Int']>;
+  file: Scalars['Upload'];
+};
+
+export type SubmitKnowledgeMeetingParticipantsInput = {
+  CursusID?: Maybe<Scalars['Int']>;
+};
+
+export type SaveKnowledgeMeetingInput = {
+  CursusID?: Maybe<Scalars['Int']>;
+  SessieID?: Maybe<Scalars['Int']>;
+  VakID: Scalars['Int'];
+  LokatieID: Scalars['Int'];
+  Titel: Scalars['SafeString'];
+  Promotietekst: Scalars['SafeString'];
+  Prijs: Scalars['Float'];
+  MaximumCursisten: Scalars['Int'];
+  Opmerkingen?: Maybe<Scalars['SafeString']>;
+  Datum: Scalars['Date'];
+  Begintijd: Scalars['Date'];
+  Eindtijd: Scalars['Date'];
+  IsBesloten?: Maybe<Scalars['Boolean']>;
+  Docent?: Maybe<Scalars['SafeString']>;
+};
+
+export type DeleteKnowledgeMeetingInput = {
+  CursusID?: Maybe<Scalars['Int']>;
+};
+
+export type SaveKnowledgeMeetingResult = {
+  __typename?: 'SaveKnowledgeMeetingResult';
+  Cursus: Cursus;
+};
+
+export type DeleteKnowledgeMeetingResult = {
+  __typename?: 'DeleteKnowledgeMeetingResult';
+  success: Scalars['Boolean'];
+};
+
+export type UploadKnowledgeMeetingParticipantsExcelResult = {
+  __typename?: 'UploadKnowledgeMeetingParticipantsExcelResult';
+  success: Scalars['Boolean'];
+  validationErrors?: Maybe<Array<Maybe<Scalars['String']>>>;
+};
+
+export type SubmitKnowledgeMeetingParticipantsResult = {
+  __typename?: 'SubmitKnowledgeMeetingParticipantsResult';
+  success: Scalars['Boolean'];
+};
+
+export type RemoveKnowledgeMeetingParticipantResult = {
+  __typename?: 'RemoveKnowledgeMeetingParticipantResult';
+  success: Scalars['Boolean'];
+};
+
+export type RemoveKnowledgeMeetingParticipantInput = {
+  CursusID?: Maybe<Scalars['Int']>;
+  CursusDeelnameID?: Maybe<Scalars['Int']>;
+};
+
+export type KnowledgeMeeting = {
+  __typename?: 'KnowledgeMeeting';
+  Cursus?: Maybe<Cursus>;
+  Vaknorm?: Maybe<Vaknorm>;
+};
 
 export type Landen = {
   __typename?: 'Landen';
@@ -1303,6 +1745,30 @@ export type ContactgegevensInput = {
 export type SearchLocationsInput = {
   VakgroepID?: Maybe<Scalars['Int']>;
   ExamenInstellingID?: Maybe<Scalars['Int']>;
+};
+
+export type SaveMonitorInput = {
+  MonitorID?: Maybe<Scalars['Int']>;
+  ExamenInstellingID?: Maybe<Scalars['Int']>;
+  Voornaam: Scalars['SafeString'];
+  Tussenvoegsel?: Maybe<Scalars['SafeString']>;
+  Achternaam: Scalars['SafeString'];
+  Geslacht: Scalars['SafeString'];
+  Email: Scalars['Email'];
+};
+
+export type SearchMonitorsInput = {
+  ExamenInstellingID?: Maybe<Scalars['Int']>;
+};
+
+export type AssignMonitorInput = {
+  MonitorID?: Maybe<Scalars['Int']>;
+  SessieID?: Maybe<Scalars['Int']>;
+};
+
+export type UnassignMonitorInput = {
+  MonitorID?: Maybe<Scalars['Int']>;
+  SessieID?: Maybe<Scalars['Int']>;
 };
 
 export type My = {
@@ -1477,6 +1943,11 @@ export type BasicPersonData = {
   Email?: Maybe<Scalars['Email']>;
 };
 
+export type ManuallyProcessGraduatesResult = {
+  __typename?: 'manuallyProcessGraduatesResult';
+  message: Scalars['String'];
+};
+
 export type RequestLicenseInput = {
   /** The Id of the pre-education (vooropleiding) */
   preEducationId: Scalars['Int'];
@@ -1563,6 +2034,7 @@ export type SearchSpecialtyResult = {
   OrganizerPhone?: Maybe<Scalars['String']>;
   OrganizerWebsite?: Maybe<Scalars['String']>;
   PromoText?: Maybe<Scalars['String']>;
+  SpecialtyWebsite?: Maybe<Scalars['String']>;
 };
 
 export type TotaalExtBtwTarief = {
@@ -1583,6 +2055,103 @@ export type File = {
 export type MultiUploadResult = {
   __typename?: 'MultiUploadResult';
   result: Scalars['String'];
+};
+
+export type VisitationDeclaration = {
+  __typename?: 'VisitationDeclaration';
+  Visitatie?: Maybe<Visitatie>;
+  TariffDayPart: Scalars['Float'];
+  TariffKm: Scalars['Float'];
+  HasInvoice: Scalars['Boolean'];
+  InvoiceLink?: Maybe<Scalars['String']>;
+  FactuurNummer?: Maybe<Scalars['String']>;
+};
+
+export type VisitationInput = {
+  visitatieId: Scalars['Int'];
+};
+
+export type VisitationsInput = {
+  /** Filter on part of course code */
+  courseCode?: Maybe<Scalars['SafeString']>;
+  /** Filter on part of title */
+  title?: Maybe<Scalars['SafeString']>;
+  /** Filter on status */
+  status?: Maybe<VisitatieStatusEnum>;
+  /** Date range, from */
+  from?: Maybe<Scalars['Date']>;
+  /** Date range, to */
+  to?: Maybe<Scalars['Date']>;
+  pageSize: Scalars['Int'];
+  pageNumber: Scalars['Int'];
+  orderBy: OrderByArgs;
+};
+
+export type VisitationInfoNodes = {
+  __typename?: 'VisitationInfoNodes';
+  totalCount: Scalars['Int'];
+  nodes?: Maybe<Array<Maybe<Visitatie>>>;
+  pageInfo?: Maybe<PageInfo>;
+};
+
+export type UpdateVisitationReportInput = {
+  VisitatieID: Scalars['Int'];
+  Rapport: Scalars['SafeString'];
+  Rapportcijfer: Scalars['Int'];
+  DatumRapport?: Maybe<Scalars['Date']>;
+  VolgensIntentieAanbod: Scalars['Boolean'];
+  /** JSON string with ratings */
+  VragenJson: Scalars['SafeString'];
+  /** JSON string with ratings */
+  ratings?: Maybe<Array<VisitatieBeoordelingCategorieInput>>;
+  Status: VisitatieStatusEnum;
+};
+
+export type AddVisitationCommentInput = {
+  visitatieId: Scalars['Int'];
+  commentaar: Scalars['SafeString'];
+};
+
+export type VisitatieBeoordelingCategorieInput = {
+  VisitatieBeoordelingCategorieID: Scalars['ID'];
+  VisitatieID: Scalars['Int'];
+  CategorieTemplateID: Scalars['Int'];
+  CategorieNaam: Scalars['String'];
+  Weging: Scalars['Float'];
+  TotaalPunten?: Maybe<Scalars['Float']>;
+  Cijfer?: Maybe<Scalars['Float']>;
+  Versie: Scalars['String'];
+  VanafDatum: Scalars['Date'];
+  Vragen?: Maybe<Array<Maybe<VisitatieBeoordelingCategorieVraagInput>>>;
+};
+
+export type VisitatieBeoordelingCategorieVraagInput = {
+  VisitatieBeoordelingCategorieVraagID: Scalars['ID'];
+  VisitatieBeoordelingCategorieID: Scalars['ID'];
+  CategorieTemplateID: Scalars['Int'];
+  VraagTemplateID: Scalars['Int'];
+  Naam: Scalars['String'];
+  Weging: Scalars['Float'];
+  TotaalPunten?: Maybe<Scalars['Float']>;
+  Cijfer?: Maybe<Scalars['Float']>;
+  Toelichting?: Maybe<Scalars['String']>;
+  Versie: Scalars['String'];
+  VanafDatum: Scalars['Date'];
+};
+
+export type CreateDeclarationInvoiceInput = {
+  VisitatieID: Scalars['Int'];
+  NrOfKilometers?: Maybe<Scalars['Int']>;
+  NrOfDayParts?: Maybe<Scalars['Int']>;
+  PublicTransport?: Maybe<Scalars['Float']>;
+  Other?: Maybe<Scalars['Float']>;
+  OtherDescription?: Maybe<Scalars['SafeString']>;
+};
+
+export type DeclarationInvoiceCreatedResult = {
+  __typename?: 'DeclarationInvoiceCreatedResult';
+  InvoiceLink: Scalars['String'];
+  FactuurNummer: Scalars['String'];
 };
 
 export type GetMyQueryVariables = Exact<{ [key: string]: never; }>;
@@ -1685,6 +2254,186 @@ export type SaveLocationMutation = (
     { __typename?: 'Lokatie' }
     & Pick<Lokatie, 'LokatieID' | 'Naam'>
   ) }
+);
+
+export type ListKnowledgeMeetingsQueryVariables = Exact<{
+  input: ListKnowledgeMeetingsInput;
+}>;
+
+
+export type ListKnowledgeMeetingsQuery = (
+  { __typename?: 'Query' }
+  & { ListKnowledgeMeetings?: Maybe<(
+    { __typename?: 'CursusNodes' }
+    & Pick<CursusNodes, 'totalCount'>
+    & { pageInfo?: Maybe<(
+      { __typename?: 'PageInfo' }
+      & Pick<PageInfo, 'hasNextPage' | 'hasPreviousPage'>
+    )>, nodes?: Maybe<Array<Maybe<(
+      { __typename?: 'Cursus' }
+      & Pick<Cursus, 'CursusID' | 'VakID' | 'Titel' | 'CursusCode' | 'IsBesloten' | 'Status' | 'AantalCursusDeelnames'>
+      & { Sessies?: Maybe<Array<Maybe<(
+        { __typename?: 'Sessie' }
+        & Pick<Sessie, 'SessieID' | 'Datum'>
+        & { Lokatie?: Maybe<(
+          { __typename?: 'Lokatie' }
+          & Pick<Lokatie, 'LokatieID' | 'Naam'>
+          & { Contactgegevens: (
+            { __typename?: 'Contactgegevens' }
+            & Pick<Contactgegevens, 'ContactgegevensID' | 'Woonplaats'>
+          ) }
+        )> }
+      )>>>, CursusDeelnames?: Maybe<Array<Maybe<(
+        { __typename?: 'CursusDeelname' }
+        & Pick<CursusDeelname, 'Status'>
+      )>>> }
+    )>>> }
+  )> }
+);
+
+export type KnowledgeMeetingDetailsQueryVariables = Exact<{
+  input: KnowledgeMeetingDetailsInput;
+}>;
+
+
+export type KnowledgeMeetingDetailsQuery = (
+  { __typename?: 'Query' }
+  & { KnowledgeMeetingDetails?: Maybe<(
+    { __typename?: 'Exam' }
+    & { Cursus?: Maybe<(
+      { __typename?: 'Cursus' }
+      & Pick<Cursus, 'CursusID' | 'VakID' | 'CursusleiderID' | 'Prijs' | 'Titel' | 'Promotietekst' | 'MaximumCursisten' | 'Opmerkingen' | 'Status' | 'CursusCode' | 'DatumAangemaakt' | 'DatumGewijzigd' | 'PersoonIDAangemaakt' | 'PersoonIDGewijzigd' | 'AantalDeelnamesVoorlopig' | 'AantalDeelnamesAangemeld'>
+      & { Vak: (
+        { __typename?: 'Vak' }
+        & Pick<Vak, 'VakID' | 'MinimumDatum' | 'MaximumDatum' | 'Titel' | 'Afkorting' | 'VakgroepID'>
+        & { Vakgroep?: Maybe<(
+          { __typename?: 'Vakgroep' }
+          & Pick<Vakgroep, 'Naam'>
+          & { Contactgegevens: (
+            { __typename?: 'Contactgegevens' }
+            & Pick<Contactgegevens, 'Adresregel1' | 'Huisnummer' | 'HuisnummerToevoeging' | 'Woonplaats' | 'Telefoon' | 'Email' | 'TerAttentieVan'>
+          ) }
+        )>, Themas?: Maybe<Array<Maybe<(
+          { __typename?: 'Thema' }
+          & Pick<Thema, 'Naam'>
+        )>>> }
+      ), Sessies?: Maybe<Array<Maybe<(
+        { __typename?: 'Sessie' }
+        & Pick<Sessie, 'SessieID' | 'Datum' | 'Begintijd' | 'DatumBegintijd' | 'Eindtijd' | 'DatumEindtijd' | 'Opmerkingen' | 'Docent' | 'SessieType'>
+        & { Lokatie?: Maybe<(
+          { __typename?: 'Lokatie' }
+          & Pick<Lokatie, 'LokatieID' | 'Naam'>
+          & { Contactgegevens: (
+            { __typename?: 'Contactgegevens' }
+            & Pick<Contactgegevens, 'ContactgegevensID' | 'Woonplaats'>
+          ) }
+        )> }
+      )>>>, CursusDeelnames?: Maybe<Array<Maybe<(
+        { __typename?: 'CursusDeelname' }
+        & Pick<CursusDeelname, 'CursusDeelnameID' | 'Status'>
+        & { Persoon?: Maybe<(
+          { __typename?: 'Persoon' }
+          & Pick<Persoon, 'PersoonID' | 'Geboortedatum' | 'SortableFullName'>
+          & { Contactgegevens: (
+            { __typename?: 'Contactgegevens' }
+            & Pick<Contactgegevens, 'Adresregel1' | 'Postcode' | 'Woonplaats' | 'Telefoon' | 'Email'>
+          ) }
+        )> }
+      )>>> }
+    )> }
+  )> }
+);
+
+export type GetInvoicesQueryVariables = Exact<{
+  pageSize: Scalars['Int'];
+  pageNumber: Scalars['Int'];
+  sortField: Scalars['String'];
+  sortDirection: SortDirectionEnum;
+  filterInvoices?: Maybe<FilterInvoicesInput>;
+}>;
+
+
+export type GetInvoicesQuery = (
+  { __typename?: 'Query' }
+  & { invoices: (
+    { __typename?: 'FactuurNodes' }
+    & Pick<FactuurNodes, 'totalCount'>
+    & { pageInfo?: Maybe<(
+      { __typename?: 'PageInfo' }
+      & Pick<PageInfo, 'hasNextPage' | 'hasPreviousPage'>
+    )>, nodes?: Maybe<Array<Maybe<(
+      { __typename?: 'Invoice' }
+      & Pick<Invoice, 'FactuurID' | 'FactuurNummer' | 'KenmerkJaarFactuurNummer' | 'FactuurStatus' | 'StatusOpmerkingen' | 'FactuurJaar' | 'IsBetaald' | 'FactuurDatum' | 'BedragExBtw' | 'BedragIncBtw' | 'BtwBedrag' | 'ProductCode' | 'ProductNaam' | 'InvoiceLink' | 'Kenmerk'>
+    )>>> }
+  ) }
+);
+
+export type SaveKnowledgeMeetingMutationVariables = Exact<{
+  input: SaveKnowledgeMeetingInput;
+}>;
+
+
+export type SaveKnowledgeMeetingMutation = (
+  { __typename?: 'Mutation' }
+  & { saveKnowledgeMeeting?: Maybe<(
+    { __typename?: 'SaveKnowledgeMeetingResult' }
+    & { Cursus: (
+      { __typename?: 'Cursus' }
+      & Pick<Cursus, 'CursusID'>
+    ) }
+  )> }
+);
+
+export type DeleteKnowledgeMeetingMutationVariables = Exact<{
+  input: DeleteKnowledgeMeetingInput;
+}>;
+
+
+export type DeleteKnowledgeMeetingMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteKnowledgeMeeting?: Maybe<(
+    { __typename?: 'DeleteKnowledgeMeetingResult' }
+    & Pick<DeleteKnowledgeMeetingResult, 'success'>
+  )> }
+);
+
+export type UploadKnowledgeMeetingParticipantsExcelMutationVariables = Exact<{
+  input: UploadKnowledgeMeetingParticipantsExcelInput;
+}>;
+
+
+export type UploadKnowledgeMeetingParticipantsExcelMutation = (
+  { __typename?: 'Mutation' }
+  & { uploadKnowledgeMeetingParticipantsExcel?: Maybe<(
+    { __typename?: 'UploadKnowledgeMeetingParticipantsExcelResult' }
+    & Pick<UploadKnowledgeMeetingParticipantsExcelResult, 'success' | 'validationErrors'>
+  )> }
+);
+
+export type RemoveKnowledgeMeetingParticipantMutationVariables = Exact<{
+  input: RemoveKnowledgeMeetingParticipantInput;
+}>;
+
+
+export type RemoveKnowledgeMeetingParticipantMutation = (
+  { __typename?: 'Mutation' }
+  & { removeKnowledgeMeetingParticipant?: Maybe<(
+    { __typename?: 'RemoveKnowledgeMeetingParticipantResult' }
+    & Pick<RemoveKnowledgeMeetingParticipantResult, 'success'>
+  )> }
+);
+
+export type SubmitKnowledgeMeetingParticipantsMutationVariables = Exact<{
+  input: SubmitKnowledgeMeetingParticipantsInput;
+}>;
+
+
+export type SubmitKnowledgeMeetingParticipantsMutation = (
+  { __typename?: 'Mutation' }
+  & { submitKnowledgeMeetingParticipants?: Maybe<(
+    { __typename?: 'SubmitKnowledgeMeetingParticipantsResult' }
+    & Pick<SubmitKnowledgeMeetingParticipantsResult, 'success'>
+  )> }
 );
 
 
@@ -1949,3 +2698,393 @@ export function useSaveLocationMutation(baseOptions?: Apollo.MutationHookOptions
 export type SaveLocationMutationHookResult = ReturnType<typeof useSaveLocationMutation>;
 export type SaveLocationMutationResult = Apollo.MutationResult<SaveLocationMutation>;
 export type SaveLocationMutationOptions = Apollo.BaseMutationOptions<SaveLocationMutation, SaveLocationMutationVariables>;
+export const ListKnowledgeMeetingsDocument = gql`
+    query ListKnowledgeMeetings($input: listKnowledgeMeetingsInput!) {
+  ListKnowledgeMeetings(input: $input) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+    }
+    nodes {
+      CursusID
+      VakID
+      Titel
+      CursusCode
+      IsBesloten
+      Status
+      Sessies {
+        SessieID
+        Datum
+        Lokatie {
+          LokatieID
+          Naam
+          Contactgegevens {
+            ContactgegevensID
+            Woonplaats
+          }
+        }
+      }
+      CursusDeelnames {
+        Status
+      }
+      AantalCursusDeelnames
+    }
+  }
+}
+    `;
+
+/**
+ * __useListKnowledgeMeetingsQuery__
+ *
+ * To run a query within a React component, call `useListKnowledgeMeetingsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useListKnowledgeMeetingsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useListKnowledgeMeetingsQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useListKnowledgeMeetingsQuery(baseOptions?: Apollo.QueryHookOptions<ListKnowledgeMeetingsQuery, ListKnowledgeMeetingsQueryVariables>) {
+        return Apollo.useQuery<ListKnowledgeMeetingsQuery, ListKnowledgeMeetingsQueryVariables>(ListKnowledgeMeetingsDocument, baseOptions);
+      }
+export function useListKnowledgeMeetingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ListKnowledgeMeetingsQuery, ListKnowledgeMeetingsQueryVariables>) {
+          return Apollo.useLazyQuery<ListKnowledgeMeetingsQuery, ListKnowledgeMeetingsQueryVariables>(ListKnowledgeMeetingsDocument, baseOptions);
+        }
+export type ListKnowledgeMeetingsQueryHookResult = ReturnType<typeof useListKnowledgeMeetingsQuery>;
+export type ListKnowledgeMeetingsLazyQueryHookResult = ReturnType<typeof useListKnowledgeMeetingsLazyQuery>;
+export type ListKnowledgeMeetingsQueryResult = Apollo.QueryResult<ListKnowledgeMeetingsQuery, ListKnowledgeMeetingsQueryVariables>;
+export const KnowledgeMeetingDetailsDocument = gql`
+    query KnowledgeMeetingDetails($input: knowledgeMeetingDetailsInput!) {
+  KnowledgeMeetingDetails(input: $input) {
+    Cursus {
+      CursusID
+      VakID
+      CursusleiderID
+      Prijs
+      Titel
+      Promotietekst
+      MaximumCursisten
+      Opmerkingen
+      Status
+      CursusCode
+      DatumAangemaakt
+      DatumGewijzigd
+      PersoonIDAangemaakt
+      PersoonIDGewijzigd
+      AantalDeelnamesVoorlopig
+      AantalDeelnamesAangemeld
+      Vak {
+        VakID
+        MinimumDatum
+        MaximumDatum
+        Titel
+        Afkorting
+        VakgroepID
+        Vakgroep {
+          Naam
+          Contactgegevens {
+            Adresregel1
+            Huisnummer
+            HuisnummerToevoeging
+            Woonplaats
+            Telefoon
+            Email
+            TerAttentieVan
+          }
+        }
+        Themas {
+          Naam
+        }
+      }
+      Sessies {
+        SessieID
+        Datum
+        Begintijd
+        DatumBegintijd
+        Eindtijd
+        DatumEindtijd
+        Opmerkingen
+        Docent
+        SessieType
+        Lokatie {
+          LokatieID
+          Naam
+          Contactgegevens {
+            ContactgegevensID
+            Woonplaats
+          }
+        }
+      }
+      CursusDeelnames {
+        CursusDeelnameID
+        Status
+        Persoon {
+          PersoonID
+          Geboortedatum
+          SortableFullName
+          Contactgegevens {
+            Adresregel1
+            Postcode
+            Woonplaats
+            Telefoon
+            Email
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useKnowledgeMeetingDetailsQuery__
+ *
+ * To run a query within a React component, call `useKnowledgeMeetingDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useKnowledgeMeetingDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useKnowledgeMeetingDetailsQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useKnowledgeMeetingDetailsQuery(baseOptions?: Apollo.QueryHookOptions<KnowledgeMeetingDetailsQuery, KnowledgeMeetingDetailsQueryVariables>) {
+        return Apollo.useQuery<KnowledgeMeetingDetailsQuery, KnowledgeMeetingDetailsQueryVariables>(KnowledgeMeetingDetailsDocument, baseOptions);
+      }
+export function useKnowledgeMeetingDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<KnowledgeMeetingDetailsQuery, KnowledgeMeetingDetailsQueryVariables>) {
+          return Apollo.useLazyQuery<KnowledgeMeetingDetailsQuery, KnowledgeMeetingDetailsQueryVariables>(KnowledgeMeetingDetailsDocument, baseOptions);
+        }
+export type KnowledgeMeetingDetailsQueryHookResult = ReturnType<typeof useKnowledgeMeetingDetailsQuery>;
+export type KnowledgeMeetingDetailsLazyQueryHookResult = ReturnType<typeof useKnowledgeMeetingDetailsLazyQuery>;
+export type KnowledgeMeetingDetailsQueryResult = Apollo.QueryResult<KnowledgeMeetingDetailsQuery, KnowledgeMeetingDetailsQueryVariables>;
+export const GetInvoicesDocument = gql`
+    query GetInvoices($pageSize: Int!, $pageNumber: Int!, $sortField: String!, $sortDirection: SortDirectionEnum!, $filterInvoices: FilterInvoicesInput) {
+  invoices(pageSize: $pageSize, pageNumber: $pageNumber, orderBy: {field: $sortField, sortDirection: $sortDirection}, filterInvoices: $filterInvoices) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+    }
+    nodes {
+      FactuurID
+      FactuurNummer
+      KenmerkJaarFactuurNummer
+      FactuurStatus
+      StatusOpmerkingen
+      FactuurJaar
+      IsBetaald
+      FactuurDatum
+      BedragExBtw
+      BedragIncBtw
+      BtwBedrag
+      ProductCode
+      ProductNaam
+      InvoiceLink
+      Kenmerk
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetInvoicesQuery__
+ *
+ * To run a query within a React component, call `useGetInvoicesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetInvoicesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetInvoicesQuery({
+ *   variables: {
+ *      pageSize: // value for 'pageSize'
+ *      pageNumber: // value for 'pageNumber'
+ *      sortField: // value for 'sortField'
+ *      sortDirection: // value for 'sortDirection'
+ *      filterInvoices: // value for 'filterInvoices'
+ *   },
+ * });
+ */
+export function useGetInvoicesQuery(baseOptions?: Apollo.QueryHookOptions<GetInvoicesQuery, GetInvoicesQueryVariables>) {
+        return Apollo.useQuery<GetInvoicesQuery, GetInvoicesQueryVariables>(GetInvoicesDocument, baseOptions);
+      }
+export function useGetInvoicesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetInvoicesQuery, GetInvoicesQueryVariables>) {
+          return Apollo.useLazyQuery<GetInvoicesQuery, GetInvoicesQueryVariables>(GetInvoicesDocument, baseOptions);
+        }
+export type GetInvoicesQueryHookResult = ReturnType<typeof useGetInvoicesQuery>;
+export type GetInvoicesLazyQueryHookResult = ReturnType<typeof useGetInvoicesLazyQuery>;
+export type GetInvoicesQueryResult = Apollo.QueryResult<GetInvoicesQuery, GetInvoicesQueryVariables>;
+export const SaveKnowledgeMeetingDocument = gql`
+    mutation saveKnowledgeMeeting($input: SaveKnowledgeMeetingInput!) {
+  saveKnowledgeMeeting(input: $input) {
+    Cursus {
+      CursusID
+    }
+  }
+}
+    `;
+export type SaveKnowledgeMeetingMutationFn = Apollo.MutationFunction<SaveKnowledgeMeetingMutation, SaveKnowledgeMeetingMutationVariables>;
+
+/**
+ * __useSaveKnowledgeMeetingMutation__
+ *
+ * To run a mutation, you first call `useSaveKnowledgeMeetingMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSaveKnowledgeMeetingMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [saveKnowledgeMeetingMutation, { data, loading, error }] = useSaveKnowledgeMeetingMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSaveKnowledgeMeetingMutation(baseOptions?: Apollo.MutationHookOptions<SaveKnowledgeMeetingMutation, SaveKnowledgeMeetingMutationVariables>) {
+        return Apollo.useMutation<SaveKnowledgeMeetingMutation, SaveKnowledgeMeetingMutationVariables>(SaveKnowledgeMeetingDocument, baseOptions);
+      }
+export type SaveKnowledgeMeetingMutationHookResult = ReturnType<typeof useSaveKnowledgeMeetingMutation>;
+export type SaveKnowledgeMeetingMutationResult = Apollo.MutationResult<SaveKnowledgeMeetingMutation>;
+export type SaveKnowledgeMeetingMutationOptions = Apollo.BaseMutationOptions<SaveKnowledgeMeetingMutation, SaveKnowledgeMeetingMutationVariables>;
+export const DeleteKnowledgeMeetingDocument = gql`
+    mutation deleteKnowledgeMeeting($input: DeleteKnowledgeMeetingInput!) {
+  deleteKnowledgeMeeting(input: $input) {
+    success
+  }
+}
+    `;
+export type DeleteKnowledgeMeetingMutationFn = Apollo.MutationFunction<DeleteKnowledgeMeetingMutation, DeleteKnowledgeMeetingMutationVariables>;
+
+/**
+ * __useDeleteKnowledgeMeetingMutation__
+ *
+ * To run a mutation, you first call `useDeleteKnowledgeMeetingMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteKnowledgeMeetingMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteKnowledgeMeetingMutation, { data, loading, error }] = useDeleteKnowledgeMeetingMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteKnowledgeMeetingMutation(baseOptions?: Apollo.MutationHookOptions<DeleteKnowledgeMeetingMutation, DeleteKnowledgeMeetingMutationVariables>) {
+        return Apollo.useMutation<DeleteKnowledgeMeetingMutation, DeleteKnowledgeMeetingMutationVariables>(DeleteKnowledgeMeetingDocument, baseOptions);
+      }
+export type DeleteKnowledgeMeetingMutationHookResult = ReturnType<typeof useDeleteKnowledgeMeetingMutation>;
+export type DeleteKnowledgeMeetingMutationResult = Apollo.MutationResult<DeleteKnowledgeMeetingMutation>;
+export type DeleteKnowledgeMeetingMutationOptions = Apollo.BaseMutationOptions<DeleteKnowledgeMeetingMutation, DeleteKnowledgeMeetingMutationVariables>;
+export const UploadKnowledgeMeetingParticipantsExcelDocument = gql`
+    mutation uploadKnowledgeMeetingParticipantsExcel($input: UploadKnowledgeMeetingParticipantsExcelInput!) {
+  uploadKnowledgeMeetingParticipantsExcel(input: $input) {
+    success
+    validationErrors
+  }
+}
+    `;
+export type UploadKnowledgeMeetingParticipantsExcelMutationFn = Apollo.MutationFunction<UploadKnowledgeMeetingParticipantsExcelMutation, UploadKnowledgeMeetingParticipantsExcelMutationVariables>;
+
+/**
+ * __useUploadKnowledgeMeetingParticipantsExcelMutation__
+ *
+ * To run a mutation, you first call `useUploadKnowledgeMeetingParticipantsExcelMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUploadKnowledgeMeetingParticipantsExcelMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [uploadKnowledgeMeetingParticipantsExcelMutation, { data, loading, error }] = useUploadKnowledgeMeetingParticipantsExcelMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUploadKnowledgeMeetingParticipantsExcelMutation(baseOptions?: Apollo.MutationHookOptions<UploadKnowledgeMeetingParticipantsExcelMutation, UploadKnowledgeMeetingParticipantsExcelMutationVariables>) {
+        return Apollo.useMutation<UploadKnowledgeMeetingParticipantsExcelMutation, UploadKnowledgeMeetingParticipantsExcelMutationVariables>(UploadKnowledgeMeetingParticipantsExcelDocument, baseOptions);
+      }
+export type UploadKnowledgeMeetingParticipantsExcelMutationHookResult = ReturnType<typeof useUploadKnowledgeMeetingParticipantsExcelMutation>;
+export type UploadKnowledgeMeetingParticipantsExcelMutationResult = Apollo.MutationResult<UploadKnowledgeMeetingParticipantsExcelMutation>;
+export type UploadKnowledgeMeetingParticipantsExcelMutationOptions = Apollo.BaseMutationOptions<UploadKnowledgeMeetingParticipantsExcelMutation, UploadKnowledgeMeetingParticipantsExcelMutationVariables>;
+export const RemoveKnowledgeMeetingParticipantDocument = gql`
+    mutation removeKnowledgeMeetingParticipant($input: RemoveKnowledgeMeetingParticipantInput!) {
+  removeKnowledgeMeetingParticipant(input: $input) {
+    success
+  }
+}
+    `;
+export type RemoveKnowledgeMeetingParticipantMutationFn = Apollo.MutationFunction<RemoveKnowledgeMeetingParticipantMutation, RemoveKnowledgeMeetingParticipantMutationVariables>;
+
+/**
+ * __useRemoveKnowledgeMeetingParticipantMutation__
+ *
+ * To run a mutation, you first call `useRemoveKnowledgeMeetingParticipantMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveKnowledgeMeetingParticipantMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeKnowledgeMeetingParticipantMutation, { data, loading, error }] = useRemoveKnowledgeMeetingParticipantMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRemoveKnowledgeMeetingParticipantMutation(baseOptions?: Apollo.MutationHookOptions<RemoveKnowledgeMeetingParticipantMutation, RemoveKnowledgeMeetingParticipantMutationVariables>) {
+        return Apollo.useMutation<RemoveKnowledgeMeetingParticipantMutation, RemoveKnowledgeMeetingParticipantMutationVariables>(RemoveKnowledgeMeetingParticipantDocument, baseOptions);
+      }
+export type RemoveKnowledgeMeetingParticipantMutationHookResult = ReturnType<typeof useRemoveKnowledgeMeetingParticipantMutation>;
+export type RemoveKnowledgeMeetingParticipantMutationResult = Apollo.MutationResult<RemoveKnowledgeMeetingParticipantMutation>;
+export type RemoveKnowledgeMeetingParticipantMutationOptions = Apollo.BaseMutationOptions<RemoveKnowledgeMeetingParticipantMutation, RemoveKnowledgeMeetingParticipantMutationVariables>;
+export const SubmitKnowledgeMeetingParticipantsDocument = gql`
+    mutation submitKnowledgeMeetingParticipants($input: SubmitKnowledgeMeetingParticipantsInput!) {
+  submitKnowledgeMeetingParticipants(input: $input) {
+    success
+  }
+}
+    `;
+export type SubmitKnowledgeMeetingParticipantsMutationFn = Apollo.MutationFunction<SubmitKnowledgeMeetingParticipantsMutation, SubmitKnowledgeMeetingParticipantsMutationVariables>;
+
+/**
+ * __useSubmitKnowledgeMeetingParticipantsMutation__
+ *
+ * To run a mutation, you first call `useSubmitKnowledgeMeetingParticipantsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSubmitKnowledgeMeetingParticipantsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [submitKnowledgeMeetingParticipantsMutation, { data, loading, error }] = useSubmitKnowledgeMeetingParticipantsMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSubmitKnowledgeMeetingParticipantsMutation(baseOptions?: Apollo.MutationHookOptions<SubmitKnowledgeMeetingParticipantsMutation, SubmitKnowledgeMeetingParticipantsMutationVariables>) {
+        return Apollo.useMutation<SubmitKnowledgeMeetingParticipantsMutation, SubmitKnowledgeMeetingParticipantsMutationVariables>(SubmitKnowledgeMeetingParticipantsDocument, baseOptions);
+      }
+export type SubmitKnowledgeMeetingParticipantsMutationHookResult = ReturnType<typeof useSubmitKnowledgeMeetingParticipantsMutation>;
+export type SubmitKnowledgeMeetingParticipantsMutationResult = Apollo.MutationResult<SubmitKnowledgeMeetingParticipantsMutation>;
+export type SubmitKnowledgeMeetingParticipantsMutationOptions = Apollo.BaseMutationOptions<SubmitKnowledgeMeetingParticipantsMutation, SubmitKnowledgeMeetingParticipantsMutationVariables>;

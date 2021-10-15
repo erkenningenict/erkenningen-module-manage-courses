@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import { FormatErrorParams } from 'yup';
 import * as yup from 'yup';
 
@@ -8,6 +8,7 @@ import { Alert } from '@erkenningen/ui/components/alert';
 import { GrowlProvider } from '@erkenningen/ui/components/growl';
 import { ThemeBureauErkenningen } from '@erkenningen/ui/layout/theme';
 import { ThemeContext } from '@erkenningen/ui/layout/theme';
+import { ConfirmProvider } from '@erkenningen/ui/components/confirm';
 
 import { ERKENNINGEN_SITE_TYPE } from '@erkenningen/config';
 
@@ -15,6 +16,8 @@ import CourseEdit from './courses/edit/CourseEdit';
 import CourseReady from './courses/ready/CourseReady';
 import { UserContext, useAuth, Roles, hasOneOfRoles } from './shared/Auth';
 import CourseNew from 'courses/edit/CourseNew';
+import CourseParticipants from 'courses/participants/CourseParticipants';
+import CourseList from 'courses/list/CourseList';
 
 // @TODO Move to lib?
 yup.setLocale({
@@ -72,17 +75,27 @@ const App: React.FC<{}> = (props) => {
       <ThemeContext.Provider value={{ mode: ERKENNINGEN_SITE_TYPE }}>
         <ThemeBureauErkenningen>
           <GrowlProvider>
-            <Switch>
-              <Route path="/wijzig/:id" component={CourseEdit} />
-              <Route path="/nieuw" component={CourseNew} />
-              <Route path="/gereed" component={CourseReady} />
-              <Route path="/overzicht">List courses</Route>
-              <Route path="/" component={CourseNew} />
-              <Route>
-                Route not found, please set a route in the url hash (e.g. /overzicht, /wijzig/1234
-                or /nieuw)
-              </Route>
-            </Switch>
+            <ConfirmProvider>
+              <Switch>
+                <Route path="/wijzig/:id" component={CourseEdit} />
+                <Route path="/nieuw" component={CourseNew} />
+                <Route path="/gereed" component={CourseReady} />
+                <Route path="/deelnemers/:id" component={CourseParticipants} />
+                <Route path="/overzicht" component={CourseList} />
+                <Route path="/" component={CourseNew} />
+                <Route path="/">
+                  <Redirect
+                    to={{
+                      pathname: '/overzicht',
+                    }}
+                  />
+                </Route>
+                <Route>
+                  Route not found, please set a route in the url hash (e.g. /overzicht, /wijzig/1234
+                  or /nieuw)
+                </Route>
+              </Switch>
+            </ConfirmProvider>
           </GrowlProvider>
         </ThemeBureauErkenningen>
       </ThemeContext.Provider>

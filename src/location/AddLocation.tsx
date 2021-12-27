@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { gql } from 'apollo-boost';
 import { Dialog } from 'primereact/dialog';
 import { FormikProps, FormikHelpers } from 'formik';
 import * as yup from 'yup';
@@ -17,6 +16,7 @@ import {
   SearchLocationsQuery,
   useSaveLocationMutation,
 } from 'generated/graphql';
+import { gql } from '@apollo/client';
 
 const AddLocation: React.FC<{
   onHide: (LokatieID?: number) => void;
@@ -156,7 +156,7 @@ const AddLocation: React.FC<{
           <FormItem label={' '}>
             <Button
               label={'Opslaan'}
-              buttonType="submit"
+              type="submit"
               loading={formikProps.isSubmitting}
               icon="pi pi-check"
             />

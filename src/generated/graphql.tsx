@@ -1850,6 +1850,8 @@ export type BijeenkomstenListInput = {
   status?: InputMaybe<CursusStatusEnum>;
   title?: InputMaybe<Scalars['SafeString']>;
   to?: InputMaybe<Scalars['Date']>;
+  vakId?: InputMaybe<Scalars['Int']>;
+  vakgroepId?: InputMaybe<Scalars['Int']>;
   withoutParticipants?: InputMaybe<Scalars['Boolean']>;
 };
 
@@ -2257,7 +2259,7 @@ export type BijeenkomstDetailsQueryVariables = Exact<{
 }>;
 
 
-export type BijeenkomstDetailsQuery = { BijeenkomstDetails?: { __typename?: 'Bijeenkomst', Cursus?: { __typename?: 'Cursus', CursusID: number, VakID?: number, CursusleiderID?: number, Prijs?: number, Titel?: string, Promotietekst?: string, MaximumCursisten?: number, Opmerkingen?: string, Status: CursusStatusEnum, CursusCode?: string, DatumAangemaakt?: any, DatumGewijzigd?: any, PersoonIDAangemaakt?: number, PersoonIDGewijzigd?: number, AantalDeelnamesVoorlopig?: number, AantalDeelnamesAangemeld?: number, Vak: { __typename?: 'Vak', VakID: number, MinimumDatum?: any, MaximumDatum?: any, Titel?: string, Afkorting?: string, VakgroepID?: number, Vakgroep?: { __typename?: 'Vakgroep', Naam: string, Contactgegevens: { __typename?: 'Contactgegevens', Adresregel1: string, Huisnummer: string, HuisnummerToevoeging?: string, Woonplaats: string, Telefoon?: string, Email?: string, TerAttentieVan?: string } }, Themas?: Array<{ __typename?: 'Thema', Naam: string }> }, Sessies?: Array<{ __typename?: 'Sessie', SessieID: number, Datum: any, Begintijd: any, DatumBegintijd: any, Eindtijd: any, DatumEindtijd: any, Opmerkingen: string, Docent: string, SessieType: string, Lokatie?: { __typename?: 'Lokatie', LokatieID: number, Naam: string, Contactgegevens: { __typename?: 'Contactgegevens', ContactgegevensID: number, Woonplaats: string } } }>, CursusDeelnames?: Array<{ __typename?: 'CursusDeelname', CursusDeelnameID: number, Status: CursusDeelnameStatusEnum, Persoon?: { __typename?: 'Persoon', PersoonID: number, Geboortedatum?: any, SortableFullName?: string, Contactgegevens: { __typename?: 'Contactgegevens', Adresregel1: string, Postcode: string, Woonplaats: string, Telefoon?: string, Email?: string } } }> } } };
+export type BijeenkomstDetailsQuery = { BijeenkomstDetails?: { __typename?: 'Bijeenkomst', Cursus?: { __typename?: 'Cursus', CursusID: number, VakID?: number, CursusleiderID?: number, Prijs?: number, Titel?: string, Promotietekst?: string, IsBesloten?: boolean, MaximumCursisten?: number, Opmerkingen?: string, Status: CursusStatusEnum, CursusCode?: string, DatumAangemaakt?: any, DatumGewijzigd?: any, PersoonIDAangemaakt?: number, PersoonIDGewijzigd?: number, AantalDeelnamesVoorlopig?: number, AantalDeelnamesAangemeld?: number, Vak: { __typename?: 'Vak', VakID: number, MinimumDatum?: any, MaximumDatum?: any, Titel?: string, Afkorting?: string, VakgroepID?: number, Vakgroep?: { __typename?: 'Vakgroep', Naam: string, Contactgegevens: { __typename?: 'Contactgegevens', Adresregel1: string, Huisnummer: string, HuisnummerToevoeging?: string, Woonplaats: string, Telefoon?: string, Email?: string, TerAttentieVan?: string } }, Themas?: Array<{ __typename?: 'Thema', Naam: string }> }, Sessies?: Array<{ __typename?: 'Sessie', SessieID: number, Datum: any, Begintijd: any, DatumBegintijd: any, Eindtijd: any, DatumEindtijd: any, Opmerkingen: string, Docent: string, SessieType: string, Lokatie?: { __typename?: 'Lokatie', LokatieID: number, Naam: string, Contactgegevens: { __typename?: 'Contactgegevens', ContactgegevensID: number, Woonplaats: string } } }>, CursusDeelnames?: Array<{ __typename?: 'CursusDeelname', CursusDeelnameID: number, Status: CursusDeelnameStatusEnum, Persoon?: { __typename?: 'Persoon', PersoonID: number, Geboortedatum?: any, SortableFullName?: string, Contactgegevens: { __typename?: 'Contactgegevens', Adresregel1: string, Postcode: string, Woonplaats: string, Telefoon?: string, Email?: string } } }> } } };
 
 export type GetInvoicesQueryVariables = Exact<{
   pageSize: Scalars['Int'];
@@ -2652,6 +2654,7 @@ export const BijeenkomstDetailsDocument = gql`
       Prijs
       Titel
       Promotietekst
+      IsBesloten
       MaximumCursisten
       Opmerkingen
       Status

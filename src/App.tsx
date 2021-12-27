@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { Switch, Route, Redirect } from 'react-router-dom';
-import { FormatErrorParams } from 'yup';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import * as yup from 'yup';
 
 import { Alert } from '@erkenningen/ui/components/alert';
@@ -17,14 +16,14 @@ import CourseReady from './courses/ready/CourseReady';
 import { UserContext, useAuth, Roles, hasOneOfRoles } from './shared/Auth';
 import CourseNew from 'courses/edit/CourseNew';
 import CourseParticipants from 'courses/participants/CourseParticipants';
-import CourseList from 'courses/list/CourseList';
+import ListContainer from './courses/list/ListContainer';
 
 // @TODO Move to lib?
 yup.setLocale({
   mixed: {
     default: 'Ongeldig',
     required: 'Verplicht',
-    notType: (params: FormatErrorParams) => {
+    notType: (params: any) => {
       if (!params.value) {
         return 'Verplicht';
       }
@@ -46,7 +45,7 @@ yup.setLocale({
   },
 });
 
-const App: React.FC<{}> = (props) => {
+const App: React.FC = () => {
   const auth = useAuth();
 
   if (auth.loading) {
@@ -76,25 +75,19 @@ const App: React.FC<{}> = (props) => {
         <ThemeBureauErkenningen>
           <GrowlProvider>
             <ConfirmProvider>
-              <Switch>
-                <Route path="/wijzig/:id" component={CourseEdit} />
-                <Route path="/nieuw" component={CourseNew} />
-                <Route path="/gereed" component={CourseReady} />
-                <Route path="/deelnemers/:id" component={CourseParticipants} />
-                <Route path="/overzicht" component={CourseList} />
-                <Route path="/" component={CourseNew} />
-                <Route path="/">
-                  <Redirect
-                    to={{
-                      pathname: '/overzicht',
-                    }}
-                  />
-                </Route>
+              <Routes>
+                <Route path="/wijzig/:cursusId" element={<CourseEdit />} />
+                <Route path="/nieuw" element={<CourseNew />} />
+                <Route path="/gereed" element={<CourseReady />} />
+                <Route path="/deelnemers/:cursusId" element={<CourseParticipants />} />
+                <Route path="/overzicht" element={<ListContainer />} />
+                {/* <Route path="/" element={<CourseNew />} /> */}
+                <Route path="/" element={<Navigate to={'/overzicht'} />}></Route>
                 <Route>
                   Route not found, please set a route in the url hash (e.g. /overzicht, /wijzig/1234
                   or /nieuw)
                 </Route>
-              </Switch>
+              </Routes>
             </ConfirmProvider>
           </GrowlProvider>
         </ThemeBureauErkenningen>

@@ -7,13 +7,13 @@ import { Panel } from '@erkenningen/ui/layout/panel';
 import {
   DebiteurTypeEnum,
   SortDirectionEnum,
+  useBijeenkomstDetailsQuery,
   useGetInvoicesQuery,
-  useKnowledgeMeetingDetailsQuery,
-  useRemoveKnowledgeMeetingParticipantMutation,
-  useSubmitKnowledgeMeetingParticipantsMutation,
-  useUploadKnowledgeMeetingParticipantsExcelMutation,
+  useRemoveBijeenkomstParticipantMutation,
+  useSubmitBijeenkomstParticipantsMutation,
+  useUploadBijeenkomstParticipantsExcelMutation,
 } from 'generated/graphql';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@erkenningen/ui/components/button';
 import { FileUpload } from '@erkenningen/ui/components/file-upload';
 import { Row } from '@erkenningen/ui/layout/row';
@@ -22,16 +22,16 @@ import { Alert } from '@erkenningen/ui/components/alert';
 import { toDutchDate } from '@erkenningen/ui/utils';
 import { FormStaticItem } from '../../components/FormStaticItem';
 
-import styles from './CourseParticipants.module.scss';
+import styles from './CourseParticipants.module.css';
 import { useConfirm } from '@erkenningen/ui/components/confirm';
 import { toDutchMoney } from '@erkenningen/ui/utils';
 import { isPast } from 'date-fns/esm';
 import Show from '../../components/Show';
 
-const CourseParticipants: React.FC<{}> = (props) => {
+const CourseParticipants: React.FC = () => {
   const { showGrowl } = useGrowlContext();
   const confirm = useConfirm();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [excelProcessingResult, setExcelProcessingResult] = useState<{
     ready: boolean;
@@ -44,15 +44,16 @@ const CourseParticipants: React.FC<{}> = (props) => {
   });
   const divRef = React.createRef<any>();
 
-  const { id: courseId } = useParams<any>();
+  const { cursusId } = useParams<'cursusId'>();
+  const courseId = cursusId ? parseInt(cursusId, 10) : 0;
 
   const {
-    loading: knowledgeMeetingLoading,
-    data: knowledgeMeeting,
-    refetch: reloadKnowledgeMeeting,
-  } = useKnowledgeMeetingDetailsQuery({
+    loading: bijeenkomstLoading,
+    data: bijeenkomst,
+    refetch: reloadBijeenkomst,
+  } = useBijeenkomstDetailsQuery({
     fetchPolicy: 'network-only',
-    variables: { input: { CursusID: +courseId } },
+    variables: { input: { cursusId: courseId } },
     onError() {
       showGrowl({
         severity: 'error',
@@ -71,43 +72,45 @@ const CourseParticipants: React.FC<{}> = (props) => {
       sortField: 'FactuurNummer',
       sortDirection: SortDirectionEnum.Asc,
       filterInvoices: {
-        CursusCode: knowledgeMeeting?.KnowledgeMeetingDetails?.Cursus?.CursusCode,
-        VakgroepID: knowledgeMeeting?.KnowledgeMeetingDetails?.Cursus?.Vak.VakgroepID,
+        CursusCode: bijeenkomst?.BijeenkomstDetails?.Cursus?.CursusCode,
+        VakgroepID: bijeenkomst?.BijeenkomstDetails?.Cursus?.Vak.VakgroepID,
         DebiteurType: DebiteurTypeEnum.Vakgroep,
-        DebiteurID: knowledgeMeeting?.KnowledgeMeetingDetails?.Cursus?.Vak.VakgroepID,
+        DebiteurID: bijeenkomst?.BijeenkomstDetails?.Cursus?.Vak.VakgroepID,
       },
     },
   });
 
   const [uploadParticipantsExcel, { loading: uploadParticipantsExcelLoading }] =
-    useUploadKnowledgeMeetingParticipantsExcelMutation({
-      onCompleted(data) {
+    useUploadBijeenkomstParticipantsExcelMutation({
+      onCompleted() {
         showGrowl({
           severity: 'success',
-          summary: 'Excelbestand geupload',
+          summary: 'Excel bestand geupload',
         });
 
-        reloadKnowledgeMeeting();
+        reloadBijeenkomst();
       },
-      onError(e) {
+      onError(e: any) {
+        console.error('Fout bij verwerken Excel bestand ', e);
         showGrowl({
           severity: 'error',
-          summary: 'Fout bij verwerken excelbestand',
+          summary: 'Fout bij verwerken Excel bestand',
           detail: e.message,
         });
       },
     });
 
-  const [removeParticipant] = useRemoveKnowledgeMeetingParticipantMutation({
-    onCompleted(data) {
+  const [removeParticipant] = useRemoveBijeenkomstParticipantMutation({
+    onCompleted() {
       showGrowl({
         severity: 'success',
         summary: 'Deelnemer verwijderd',
       });
 
-      reloadKnowledgeMeeting();
+      reloadBijeenkomst();
     },
-    onError(e) {
+    onError(e: any) {
+      console.error('Fout bij verwijderen deelnemer', e);
       showGrowl({
         severity: 'error',
         summary: 'Fout bij verwijderen deelnemer',
@@ -116,26 +119,28 @@ const CourseParticipants: React.FC<{}> = (props) => {
     },
   });
 
-  const [submitParticipants, submitParticipantsMutation] =
-    useSubmitKnowledgeMeetingParticipantsMutation({
-      onCompleted(data) {
+  const [submitParticipants, submitParticipantsMutation] = useSubmitBijeenkomstParticipantsMutation(
+    {
+      onCompleted() {
         showGrowl({
           severity: 'success',
           summary: 'Deelnemers definitief aangemeld',
         });
 
-        reloadKnowledgeMeeting();
+        reloadBijeenkomst();
       },
-      onError(e) {
+      onError(e: any) {
+        console.error('Fout bij definitief aanmelden', e);
         showGrowl({
           severity: 'error',
           summary: 'Fout bij definitief aanmelden',
           detail: e.message,
         });
       },
-    });
+    },
+  );
 
-  if (knowledgeMeetingLoading) {
+  if (bijeenkomstLoading) {
     return (
       <Panel title="Kennisbijeenkomst" className="form-horizontal">
         <Spinner text={'Gegevens laden...'} />
@@ -143,7 +148,7 @@ const CourseParticipants: React.FC<{}> = (props) => {
     );
   }
 
-  if (!courseId || !knowledgeMeeting?.KnowledgeMeetingDetails?.Cursus) {
+  if (!courseId || !bijeenkomst?.BijeenkomstDetails?.Cursus) {
     return (
       <Panel title="Kennisbijeenkomst details" className="form-horizontal">
         <Alert type="danger">Cursus niet gevonden</Alert>
@@ -151,7 +156,7 @@ const CourseParticipants: React.FC<{}> = (props) => {
     );
   }
 
-  const course = knowledgeMeeting?.KnowledgeMeetingDetails.Cursus;
+  const course = bijeenkomst?.BijeenkomstDetails.Cursus;
   const session = course?.Sessies?.length ? course?.Sessies[0] : null;
 
   const uploadParticipants = async (file: File) => {
@@ -186,7 +191,7 @@ const CourseParticipants: React.FC<{}> = (props) => {
         success: false,
         validationErrors: ['Onbekende fout opgetreden'],
       });
-    } else if (result.data?.uploadKnowledgeMeetingParticipantsExcel?.success) {
+    } else if (result.data?.uploadBijeenkomstParticipantsExcel?.success) {
       setExcelProcessingResult({
         ready: true,
         success: true,
@@ -196,8 +201,9 @@ const CourseParticipants: React.FC<{}> = (props) => {
       setExcelProcessingResult({
         ready: true,
         success: false,
-        validationErrors: result.data?.uploadKnowledgeMeetingParticipantsExcel
-          ?.validationErrors || ['Onbekende fout opgetreden'],
+        validationErrors: result.data?.uploadBijeenkomstParticipantsExcel?.validationErrors || [
+          'Onbekende fout opgetreden',
+        ],
       });
     }
   };
@@ -490,7 +496,7 @@ const CourseParticipants: React.FC<{}> = (props) => {
       <Button
         label={'Bewerken'}
         icon="fas fa-edit"
-        onClick={() => history.push(`/wijzig/${course.CursusID}`)}
+        onClick={() => navigate(`/wijzig/${course.CursusID}`)}
         style={{ marginRight: '1rem' }}
       />
       <Link to="/overzicht">Terug naar overzicht</Link>

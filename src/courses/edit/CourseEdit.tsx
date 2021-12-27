@@ -2,9 +2,9 @@ import React, { useState, useContext } from 'react';
 
 import { Button } from '@erkenningen/ui/components/button';
 import { FormikProps, FormikHelpers } from 'formik';
-import { addBusinessDays, addYears, subDays } from 'date-fns';
+import { addBusinessDays, addYears, startOfDay, subDays } from 'date-fns';
 import * as yup from 'yup';
-import { useHistory } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import {
   FormText,
@@ -29,35 +29,44 @@ import {
   useSpecialtyQuery,
   useCreateCourseMutation,
   SearchLocationsQuery,
+  useBijeenkomstDetailsQuery,
+  useSaveBijeenkomstMutation,
 } from 'generated/graphql';
+import { Alert } from '@erkenningen/ui/components/alert';
+import { getTimeDisplay } from '../../shared/utils';
 
-const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
+const CourseEdit: React.FC<{ specialtyId?: number }> = () => {
   const [showAddLocationDialog, setShowAddLocationDialog] = useState<boolean>(false);
   const [currentForm, setCurrentForm] = useState<FormikProps<any>>();
   const { clearGrowl, showGrowl } = useGrowlContext();
-  const user = useContext(UserContext);
-  const history = useHistory();
 
-  const { loading: specialtyLoading, data: specialty } = useSpecialtyQuery({
-    variables: { vakId: props.specialtyId },
-    onError() {
+  const { cursusId } = useParams<'cursusId'>();
+  const courseId = parseInt(cursusId || '0', 10);
+  const user = useContext(UserContext);
+  const navigate = useNavigate();
+
+  const { loading: bijeenkomstLoading, data: bijeenkomst } = useBijeenkomstDetailsQuery({
+    variables: { input: { cursusId: courseId } },
+    fetchPolicy: 'network-only',
+    onError(e) {
+      console.log('#DH# e', e);
       showGrowl({
         severity: 'error',
-        summary: 'Kennisaanbod ophalen',
+        summary: 'Bijeenkomst gegevens ophalen',
         sticky: true,
-        detail: `Er is een fout opgetreden bij het ophalen van het kennisaanbod. Controleer uw invoer of neem contact op met Bureau Erkenningen`,
+        detail: `Er is een fout opgetreden bij het ophalen van bijeenkomst. Controleer uw invoer of neem contact op met Bureau Erkenningen`,
       });
     },
   });
 
-  const [createCourse] = useCreateCourseMutation({
-    onCompleted(data) {
+  const [saveBijeenkomst] = useSaveBijeenkomstMutation({
+    onCompleted() {
       showGrowl({
         severity: 'success',
         summary: 'Bijeenkomst aangemaakt',
         detail: 'De bijeenkomst is succesvol aangemaakt.',
       });
-      history.push('/gereed');
+      navigate('/overzicht');
     },
     onError(e) {
       showGrowl({
@@ -81,69 +90,81 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
     setShowAddLocationDialog(false);
   };
 
-  if (specialtyLoading) {
+  if (bijeenkomstLoading) {
     return <Spinner text={'Gegevens laden...'} />;
   }
 
-  if (!specialty?.Specialty) {
+  if (!bijeenkomst?.BijeenkomstDetails?.Cursus) {
     return null;
   }
+  const cursus = bijeenkomst?.BijeenkomstDetails?.Cursus;
+  const sessie = cursus.Sessies ? cursus.Sessies[0] : null;
+  console.log('#DH# cursus', cursus);
+
+  if (!sessie) {
+    return (
+      <Panel title="Examen wijzigen" className="form-horizontal">
+        <Alert type="danger">Sessie bij cursus ontbreekt</Alert>
+      </Panel>
+    );
+  }
+
+  const timeFilter = /(0[0-9]|1[0-9]|2[0-3])\.[0-5][0-9]/;
 
   return (
     <>
       <Form
         schema={{
-          LokatieID: [specialty.Specialty.DigitaalAanbod ? 10 : 20, yup.number().required()],
-          Titel: [specialty.Specialty.Titel, yup.string().max(255).required()],
-          Promotietekst: [specialty.Specialty.Promotietekst, yup.string().max(5000).required()],
-          Prijs: [specialty.Specialty.Kosten, yup.number().required()],
-          IsBesloten: [false, yup.boolean().required()],
-          MaximumCursisten: [specialty.Specialty.MaximumCursisten, yup.number().required()],
-          Opmerkingen: ['', yup.string().max(1000)],
-          Datum: [null, yup.date().required()],
+          LokatieID: [sessie.Lokatie?.LokatieID, yup.number().required()],
+          Titel: [cursus?.Titel, yup.string().max(255).required()],
+          Promotietekst: [cursus?.Promotietekst, yup.string().max(5000).required()],
+          Prijs: [cursus?.Prijs, yup.number().required()],
+          IsBesloten: [cursus?.IsBesloten, yup.boolean().required()],
+          MaximumCursisten: [cursus?.MaximumCursisten, yup.number().required()],
+          Opmerkingen: [cursus?.Opmerkingen, yup.string().max(1000)],
+          Datum: [sessie.Datum ? new Date(sessie.Datum) : null, yup.date().required()],
           Begintijd: [
-            null,
+            sessie.Begintijd ? getTimeDisplay(sessie.Begintijd) : '',
             yup
               .string()
               .matches(
-                /^(0[0-9]|1[0-9]|2[0-3])\.[0-5][0-9]$/g,
+                /^(0[0-9]|1[0-9]|2[0-3])(\.|:)[0-5][0-9]$/g,
                 'Tijd moet in uu.mm formaat, bijv. 15.30',
               )
               .required(),
           ],
           Eindtijd: [
-            null,
+            sessie.Eindtijd ? getTimeDisplay(sessie.Eindtijd) : '',
             yup
               .string()
               .matches(
-                /^(0[0-9]|1[0-9]|2[0-3])\.[0-5][0-9]$/g,
+                /^(0[0-9]|1[0-9]|2[0-3])(\.|:)[0-5][0-9]$/g,
                 'Tijd moet in uu.mm formaat, bijv. 15.30',
               )
               .required()
               .test('greaterThan', 'Eindtijd moet na begintijd liggen', function (v) {
-                return !v || this.resolve(yup.ref('Begintijd')) < v;
+                return !v || this.resolve(yup.ref('Begintijd') as any) < v;
               }),
           ],
-          Docent: ['', yup.string()],
+          Docent: [sessie.Docent, yup.string()],
         }}
-        onSubmit={async (values, actions: FormikHelpers<any>) => {
-          if (!specialty.Specialty) {
-            return;
-          }
-
+        onSubmit={async (values) => {
           clearGrowl();
 
-          await createCourse({
+          console.log('#DH# formValues', values);
+          await saveBijeenkomst({
             variables: {
               input: {
-                VakID: +specialty.Specialty.VakID,
+                CursusID: cursus.CursusID,
+                SessieID: sessie.SessieID,
+                VakID: cursus.VakID || 0,
                 Titel: values.Titel,
                 Promotietekst: values.Promotietekst,
+                IsBesloten: values.IsBesloten,
                 Prijs: parseFloat(values.Prijs),
                 MaximumCursisten: parseInt(values.MaximumCursisten),
-                IsBesloten: values.IsBesloten,
                 Opmerkingen: values.Opmerkingen,
-                Datum: values.Datum,
+                Datum: startOfDay(values.Datum),
                 Begintijd: new Date('01-01-2000 ' + values.Begintijd.replace('.', ':')),
                 Eindtijd: new Date('01-01-2000 ' + values.Eindtijd.replace('.', ':')),
                 LokatieID: parseInt(values.LokatieID),
@@ -157,8 +178,8 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
           <>
             <Panel title="Bijeenkomst" className="form-horizontal">
               <p>
-                Kennisaanbod geldig van {toDutchDate(specialty.Specialty?.MinimumDatum)} t/m{' '}
-                {toDutchDate(specialty.Specialty?.MaximumDatum)}
+                Kennisaanbod met titel: {cursus.Vak.Titel}. <br></br>Geldig van{' '}
+                {toDutchDate(cursus.Vak.MinimumDatum)} t/m {toDutchDate(cursus.Vak.MaximumDatum)}
               </p>
               <FormText name={'Titel'} label={'Titel *'} />
               <FormText name={'Promotietekst'} label={'Promotietekst *'} isTextArea={true} />
@@ -192,14 +213,14 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                 label={'Begintijd *'}
                 placeholder="uu.mm"
                 formControlClassName="col-sm-3"
-                keyfilter="(0[0-9]|1[0-9]|2[0-3])\.[0-5][0-9]"
+                keyfilter={timeFilter}
               />
               <FormText
                 name={'Eindtijd'}
                 label={'Eindtijd *'}
                 placeholder="uu.mm"
                 formControlClassName="col-sm-3"
-                keyfilter="(0[0-9]|1[0-9]|2[0-3])\.[0-5][0-9]"
+                keyfilter={timeFilter}
               />
 
               {formikProps.values.LokatieID === 10 ? (
@@ -245,12 +266,12 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                     );
                   }}
                   gqlQuery={SearchLocationsDocument}
-                  variables={{ VakgroepID: specialty.Specialty?.VakgroepID }}
+                  variables={{ VakgroepID: cursus.Vak?.VakgroepID }}
                 >
                   <Button
                     className="mr-2"
                     label="Nieuwe locatie aanmaken"
-                    type="link"
+                    buttonType="link"
                     onClick={() => onNewLocationClick(formikProps)}
                   />
                 </FormSelectGql>
@@ -261,7 +282,13 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                 placeholder={'Voer optioneel docenten in'}
               />
               <FormItem label={' '}>
-                <Button label={'Opslaan'} buttonType="submit" icon="pi pi-check" />
+                <Button label={'Opslaan'} type="submit" icon="pi pi-check" />
+                <Button
+                  label={'Annuleren'}
+                  buttonType="light"
+                  type="button"
+                  onClick={() => navigate('/overzicht')}
+                />
               </FormItem>
             </Panel>
           </>
@@ -270,7 +297,7 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
       <AddLocation
         onHide={handleAddLocation}
         visible={showAddLocationDialog}
-        vakgroepId={specialty?.Specialty.VakgroepID}
+        vakgroepId={cursus.Vak.VakgroepID}
       />
     </>
   );

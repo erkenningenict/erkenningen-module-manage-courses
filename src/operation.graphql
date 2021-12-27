@@ -76,8 +76,8 @@ mutation saveLocation($input: saveLocationInput!) {
 
 ## COPIED
 
-query ListKnowledgeMeetings($input: listKnowledgeMeetingsInput!) {
-  ListKnowledgeMeetings(input: $input) {
+query BijeenkomstenList($input: bijeenkomstenListInput!) {
+  BijeenkomstenList(input: $input) {
     totalCount
     pageInfo {
       hasNextPage
@@ -110,8 +110,8 @@ query ListKnowledgeMeetings($input: listKnowledgeMeetingsInput!) {
   }
 }
 
-query KnowledgeMeetingDetails($input: knowledgeMeetingDetailsInput!) {
-  KnowledgeMeetingDetails(input: $input) {
+query BijeenkomstDetails($input: searchBijeenkomstInput!) {
+  BijeenkomstDetails(input: $input) {
     Cursus {
       CursusID
       VakID
@@ -119,6 +119,7 @@ query KnowledgeMeetingDetails($input: knowledgeMeetingDetailsInput!) {
       Prijs
       Titel
       Promotietekst
+      IsBesloten
       MaximumCursisten
       Opmerkingen
       Status
@@ -229,44 +230,35 @@ query GetInvoices(
   }
 }
 
-mutation saveKnowledgeMeeting($input: SaveKnowledgeMeetingInput!) {
-  saveKnowledgeMeeting(input: $input) {
+mutation saveBijeenkomst($input: SaveBijeenkomstInput!) {
+  saveBijeenkomst(input: $input) {
     Cursus {
       CursusID
     }
   }
 }
 
-mutation saveLocation($input: saveLocationInput!) {
-  saveLocation(input: $input) {
-    LokatieID
-    Naam
-  }
-}
-
-mutation deleteKnowledgeMeeting($input: DeleteKnowledgeMeetingInput!) {
-  deleteKnowledgeMeeting(input: $input) {
+mutation deleteBijeenkomst($input: DeleteBijeenkomstInput!) {
+  deleteBijeenkomst(input: $input) {
     success
   }
 }
 
-mutation uploadKnowledgeMeetingParticipantsExcel(
-  $input: UploadKnowledgeMeetingParticipantsExcelInput!
-) {
-  uploadKnowledgeMeetingParticipantsExcel(input: $input) {
+mutation uploadBijeenkomstParticipantsExcel($input: UploadBijeenkomstParticipantsExcelInput!) {
+  uploadBijeenkomstParticipantsExcel(input: $input) {
     success
     validationErrors
   }
 }
 
-mutation removeKnowledgeMeetingParticipant($input: RemoveKnowledgeMeetingParticipantInput!) {
-  removeKnowledgeMeetingParticipant(input: $input) {
+mutation removeBijeenkomstParticipant($input: RemoveBijeenkomstParticipantInput!) {
+  removeBijeenkomstParticipant(input: $input) {
     success
   }
 }
 
-mutation submitKnowledgeMeetingParticipants($input: SubmitKnowledgeMeetingParticipantsInput!) {
-  submitKnowledgeMeetingParticipants(input: $input) {
+mutation submitBijeenkomstParticipants($input: SubmitBijeenkomstParticipantsInput!) {
+  submitBijeenkomstParticipants(input: $input) {
     success
   }
 }

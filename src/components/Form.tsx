@@ -18,7 +18,7 @@ const schemaValidations = (schema: FormikSchema<any>): any => {
 };
 
 export type FormikSchema<T> = {
-  [P in keyof T]: [T[P], yup.Schema<any>];
+  [P in keyof T]: [T[P], yup.SchemaOf<any>];
 };
 
 const Form: React.FC<

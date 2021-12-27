@@ -14,7 +14,7 @@ import Form from 'components/Form';
 import CourseEdit from './CourseEdit';
 import { useSearchOrganizersQuery, SpecialtiesDocument } from 'generated/graphql';
 
-const CourseNew: React.FC<{}> = () => {
+const CourseNew: React.FC = () => {
   const { showGrowl } = useGrowlContext();
   const { loading: organizersLoading, data: organizers } = useSearchOrganizersQuery({
     onError() {

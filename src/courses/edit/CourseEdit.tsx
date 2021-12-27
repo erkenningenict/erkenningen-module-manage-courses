@@ -106,8 +106,8 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
             yup
               .string()
               .matches(
-                /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/g,
-                'Tijd moet in uu:mm formaat, bijv. 15:30',
+                /^(0[0-9]|1[0-9]|2[0-3])\.[0-5][0-9]$/g,
+                'Tijd moet in uu.mm formaat, bijv. 15.30',
               )
               .required(),
           ],
@@ -116,8 +116,8 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
             yup
               .string()
               .matches(
-                /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/g,
-                'Tijd moet in uu:mm formaat, bijv. 15:30',
+                /^(0[0-9]|1[0-9]|2[0-3])\.[0-5][0-9]$/g,
+                'Tijd moet in uu.mm formaat, bijv. 15.30',
               )
               .required()
               .test('greaterThan', 'Eindtijd moet na begintijd liggen', function (v) {
@@ -144,8 +144,8 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                 IsBesloten: values.IsBesloten,
                 Opmerkingen: values.Opmerkingen,
                 Datum: values.Datum,
-                Begintijd: new Date('01-01-2000 ' + values.Begintijd),
-                Eindtijd: new Date('01-01-2000 ' + values.Eindtijd),
+                Begintijd: new Date('01-01-2000 ' + values.Begintijd.replace('.', ':')),
+                Eindtijd: new Date('01-01-2000 ' + values.Eindtijd.replace('.', ':')),
                 LokatieID: parseInt(values.LokatieID),
                 Docent: values.Docent,
               },
@@ -190,16 +190,16 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
               <FormText
                 name={'Begintijd'}
                 label={'Begintijd *'}
-                placeholder="uu:mm"
+                placeholder="uu.mm"
                 formControlClassName="col-sm-3"
-                keyfilter="(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]"
+                keyfilter="(0[0-9]|1[0-9]|2[0-3])\.[0-5][0-9]"
               />
               <FormText
                 name={'Eindtijd'}
                 label={'Eindtijd *'}
-                placeholder="uu:mm"
+                placeholder="uu.mm"
                 formControlClassName="col-sm-3"
-                keyfilter="(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]"
+                keyfilter="(0[0-9]|1[0-9]|2[0-3])\.[0-5][0-9]"
               />
 
               {formikProps.values.LokatieID === 10 ? (
@@ -217,7 +217,7 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                         { label: 'Fysieke locatie', value: null },
                       ]}
                       className={'p-button-light'}
-                      onChange={(e) => formikProps.setFieldValue('LokatieID', e.value)}
+                      onChange={(e: any) => formikProps.setFieldValue('LokatieID', e.value)}
                     />
                   </div>
                 </div>

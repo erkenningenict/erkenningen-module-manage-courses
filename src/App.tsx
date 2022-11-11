@@ -43,7 +43,7 @@ yup.setLocale({
   },
 });
 
-const App: React.FC<{}> = (props) => {
+const App: React.FC = (props) => {
   const auth = useAuth();
 
   if (auth.loading) {
@@ -63,7 +63,7 @@ const App: React.FC<{}> = (props) => {
     return <Alert type="danger">U moet ingelogd zijn om het kennisaanbod te beheren.</Alert>;
   }
 
-  if (!hasOneOfRoles([Roles.Rector, Roles.Hoogleraar], auth.my?.Roles)) {
+  if (!hasOneOfRoles([Roles.Rector, Roles.Hoogleraar], auth.my?.Roles as string[])) {
     return <Alert type="danger">U heeft geen toegang tot deze module.</Alert>;
   }
 

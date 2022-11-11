@@ -12,9 +12,15 @@ import { useGrowlContext } from '@erkenningen/ui/components/growl';
 import FormSelectGql from 'components/FormSelectGql';
 import Form from 'components/Form';
 import CourseEdit from './CourseEdit';
-import { useSearchOrganizersQuery, SpecialtiesDocument } from 'generated/graphql';
+import {
+  useSearchOrganizersQuery,
+  SpecialtiesDocument,
+  SpecialtiesQuery,
+  SpecialtiesResultFragment,
+} from 'generated/graphql';
+import { addYears } from 'date-fns';
 
-const CourseNew: React.FC<{}> = () => {
+const CourseNew: React.FC = () => {
   const { showGrowl } = useGrowlContext();
   const { loading: organizersLoading, data: organizers } = useSearchOrganizersQuery({
     onError() {
@@ -26,7 +32,10 @@ const CourseNew: React.FC<{}> = () => {
       });
     },
   });
+
   const [specialtyId, setSpecialtyId] = useState<number | undefined>(undefined);
+  const [maximumDatum, setMaximumDatum] = useState<Date | undefined>(undefined);
+  let specialties: SpecialtiesResultFragment[] = [];
 
   if (organizersLoading) {
     return <Spinner text={'Gegevens laden...'} />;
@@ -52,6 +61,7 @@ const CourseNew: React.FC<{}> = () => {
             <Panel title="Nieuwe bijeenkomst maken en plannen">
               {organizers.SearchOrganizers && organizers.SearchOrganizers.length > 1 && (
                 <FormSelect
+                  formControlClassName="col-sm-12"
                   labelClassNames="col-sm-12 text-left"
                   placeholder={'Selecteer een kennisaanbieder'}
                   name={'VakgroepID'}
@@ -71,22 +81,30 @@ const CourseNew: React.FC<{}> = () => {
               )}
               {(formikProps.values.VakgroepID || organizers.SearchOrganizers?.length === 1) && (
                 <FormSelectGql
+                  formControlClassName="col-sm-12"
                   labelClassNames="col-sm-12 text-left"
                   placeholder={'Selecteer een kennisaanbod'}
                   name={'VakID'}
                   label={'Kies het kennisaanbod waarop u de nieuwe bijeenkomst wilt baseren:'}
                   filter={true}
                   gqlQuery={SpecialtiesDocument}
-                  mapResult={(data: any) =>
-                    data.Specialties.map((item: any) => ({
-                      label: `${item.VakID} | geldig tot: ${toDutchDate(
-                        new Date(item.MaximumDatum),
-                      )} | ${item.Titel} | ${item.Competenties[0]?.Code} | ${item.Themas[0]?.Code}${
-                        item.DigitaalAanbod ? ' | Digitaal aanbod' : ''
-                      }`,
-                      value: item.VakID,
-                    }))
-                  }
+                  onData={(data: any) => {
+                    if (data) {
+                      specialties = data?.Specialties as SpecialtiesResultFragment[];
+                    }
+                  }}
+                  mapResult={(data: SpecialtiesQuery) => {
+                    return (
+                      data.Specialties?.map((item: SpecialtiesResultFragment) => ({
+                        label: `${item.VakID} | geldig tot: ${toDutchDate(
+                          new Date(item.MaximumDatum),
+                        )} | ${item.Titel} | ${item.Competenties![0]?.Code} | ${
+                          item.Themas![0]?.Code
+                        }${item.DigitaalAanbod ? ' | Digitaal aanbod' : ''}`,
+                        value: item.VakID,
+                      })) ?? []
+                    );
+                  }}
                   variables={{
                     vakgroepId:
                       +formikProps.values.VakgroepID ||
@@ -96,7 +114,11 @@ const CourseNew: React.FC<{}> = () => {
                         0
                       ),
                   }}
-                  onChange={(e) => setSpecialtyId(+e.value)}
+                  onChange={(e) => {
+                    const specialty = specialties?.find((s) => s.VakID === +e.value);
+                    setMaximumDatum(new Date(specialty?.MaximumDatum) || new Date());
+                    setSpecialtyId(specialty?.VakID);
+                  }}
                   value={specialtyId}
                 />
               )}
@@ -104,7 +126,12 @@ const CourseNew: React.FC<{}> = () => {
           </>
         )}
       </Form>
-      {specialtyId && <CourseEdit specialtyId={specialtyId}></CourseEdit>}
+      {specialtyId && (
+        <CourseEdit
+          specialtyId={specialtyId}
+          maximumDatum={maximumDatum || addYears(new Date(), 1)}
+        ></CourseEdit>
+      )}
     </>
   );
 };

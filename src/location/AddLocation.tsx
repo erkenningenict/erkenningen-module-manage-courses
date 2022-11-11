@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { gql } from 'apollo-boost';
+import { gql } from '@apollo/client';
 import { Dialog } from 'primereact/dialog';
 import { FormikProps, FormikHelpers } from 'formik';
 import * as yup from 'yup';
@@ -113,6 +113,7 @@ const AddLocation: React.FC<{
         <Dialog
           header="Locatie toevoegen"
           modal={true}
+          appendTo={'self'}
           onHide={props.onHide}
           visible={props.visible}
           style={{ width: '50vw', ...dialogOverflow }}
@@ -156,7 +157,7 @@ const AddLocation: React.FC<{
           <FormItem label={' '}>
             <Button
               label={'Opslaan'}
-              buttonType="submit"
+              type="submit"
               loading={formikProps.isSubmitting}
               icon="pi pi-check"
             />

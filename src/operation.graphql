@@ -26,24 +26,28 @@ query SearchOrganizers {
 
 query Specialties($vakgroepId: Int!) {
   Specialties(input: { vakgroepId: $vakgroepId }) {
-    VakID
-    Afkorting
-    Code
-    Titel
-    Kosten
-    MinimumDatum
-    MaximumDatum
-    Competenties {
-      Naam
-      Code
-    }
-    Themas {
-      Naam
-      Code
-    }
-    Promotietekst
-    DigitaalAanbod
+    ...SpecialtiesResult
   }
+}
+
+fragment SpecialtiesResult on Vak {
+  VakID
+  Afkorting
+  Code
+  Titel
+  Kosten
+  MinimumDatum
+  MaximumDatum
+  Competenties {
+    Naam
+    Code
+  }
+  Themas {
+    Naam
+    Code
+  }
+  Promotietekst
+  DigitaalAanbod
 }
 
 query Specialty($vakId: Int!) {

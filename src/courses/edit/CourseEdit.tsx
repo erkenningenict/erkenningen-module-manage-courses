@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 
 import { Button } from '@erkenningen/ui/components/button';
 import { FormikProps, FormikHelpers } from 'formik';
-import { addBusinessDays, addYears, subDays } from 'date-fns';
+import { addBusinessDays, subDays } from 'date-fns';
 import * as yup from 'yup';
 import { useHistory } from 'react-router-dom';
 
@@ -31,7 +31,12 @@ import {
   SearchLocationsQuery,
 } from 'generated/graphql';
 
-const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
+export interface CourseEditProps {
+  specialtyId: number;
+  maximumDatum: Date;
+}
+
+const CourseEdit: React.FC<CourseEditProps> = (props) => {
   const [showAddLocationDialog, setShowAddLocationDialog] = useState<boolean>(false);
   const [currentForm, setCurrentForm] = useState<FormikProps<any>>();
   const { clearGrowl, showGrowl } = useGrowlContext();
@@ -51,7 +56,7 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
   });
 
   const [createCourse] = useCreateCourseMutation({
-    onCompleted(data) {
+    onCompleted() {
       showGrowl({
         severity: 'success',
         summary: 'Bijeenkomst aangemaakt',
@@ -181,25 +186,29 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                 label={'Datum *'}
                 formControlClassName="col-sm-3"
                 minDate={
-                  hasRole(Roles.Rector, user?.Roles)
+                  hasRole(Roles.Rector, user?.Roles as string[])
                     ? subDays(new Date(), 100)
                     : addBusinessDays(new Date(), 4)
                 }
-                maxDate={addYears(new Date(), 50)}
+                maxDate={
+                  hasRole(Roles.Rector, user?.Roles as string[])
+                    ? addBusinessDays(new Date(), 360)
+                    : props.maximumDatum
+                }
               />
               <FormText
                 name={'Begintijd'}
                 label={'Begintijd *'}
                 placeholder="uu.mm"
                 formControlClassName="col-sm-3"
-                keyfilter="(0[0-9]|1[0-9]|2[0-3])\.[0-5][0-9]"
+                keyfilter={/(0[0-9]|1[0-9]|2[0-3])(\.|:)[0-5][0-9]/}
               />
               <FormText
                 name={'Eindtijd'}
                 label={'Eindtijd *'}
                 placeholder="uu.mm"
                 formControlClassName="col-sm-3"
-                keyfilter="(0[0-9]|1[0-9]|2[0-3])\.[0-5][0-9]"
+                keyfilter={/(0[0-9]|1[0-9]|2[0-3])(\.|:)[0-5][0-9]/}
               />
 
               {formikProps.values.LokatieID === 10 ? (
@@ -228,7 +237,7 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                   name={'LokatieID'}
                   label={'Locatie *'}
                   placeholder={'Selecteer een locatie'}
-                  formControlClassName="col-sm-5"
+                  formControlClassName="col-sm-9"
                   filter={true}
                   mapResult={(data: SearchLocationsQuery) => {
                     return (
@@ -250,7 +259,8 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                   <Button
                     className="mr-2"
                     label="Nieuwe locatie aanmaken"
-                    type="link"
+                    type="button"
+                    buttonType="link"
                     onClick={() => onNewLocationClick(formikProps)}
                   />
                 </FormSelectGql>
@@ -261,7 +271,7 @@ const CourseEdit: React.FC<{ specialtyId: number }> = (props) => {
                 placeholder={'Voer optioneel docenten in'}
               />
               <FormItem label={' '}>
-                <Button label={'Opslaan'} buttonType="submit" icon="pi pi-check" />
+                <Button label={'Opslaan'} type="submit" icon="pi pi-check" />
               </FormItem>
             </Panel>
           </>

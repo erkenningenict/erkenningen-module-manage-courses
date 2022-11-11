@@ -10,11 +10,16 @@ const FormSelectGql: React.FC<
     gqlQuery: DocumentNode;
     variables?: any;
     mapResult?: (data: any) => { label: string; value: any }[];
+    onData?: (data: any[]) => void;
   } & Omit<React.ComponentProps<typeof FormSelect>, 'options'>
 > = (props) => {
   const { loading, error, data } = useQuery(props.gqlQuery, {
     variables: props.variables,
   });
+
+  if (data && props.onData) {
+    props.onData(data);
+  }
 
   if (error) {
     return <span>Fout opgetreden bij het ophalen van de gegevens</span>;
